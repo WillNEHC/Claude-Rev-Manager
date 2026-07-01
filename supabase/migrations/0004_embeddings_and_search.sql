@@ -80,7 +80,21 @@ $$;
 -- service-role key (bypasses RLS). The dashboard reads via the anon key, so we
 -- enable RLS and grant read-only to authenticated users; writes stay server-side.
 -- Tighten to per-user policies if the tool is ever multi-tenant.
+--
+-- Supabase provisions the `anon` and `authenticated` roles; a vanilla Postgres
+-- (local/CI) does not. Guard-create them so this migration is self-contained and
+-- portable — on Supabase the roles already exist and creation is skipped.
 -- -----------------------------------------------------------------------------
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'authenticated') then
+    create role authenticated nologin;
+  end if;
+  if not exists (select 1 from pg_roles where rolname = 'anon') then
+    create role anon nologin;
+  end if;
+end $$;
+
 do $$
 declare t text;
 begin

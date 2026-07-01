@@ -65,6 +65,17 @@ src/                    (Build phase) Next.js app, ingestion adapters, jobs, AI 
 
 A concrete extraction contract lives at [`docs/schemas/review-extraction.schema.json`](docs/schemas/review-extraction.schema.json).
 
+## Testing & verification
+- **Unit + integration:** `npm run typecheck && npm test` — 27 tests: config
+  validation, dedup hashing, discovery filtering, Airbnb parsing against
+  fixtures, the Firecrawl reliability layer, the pipeline end-to-end (dedup on
+  re-run, graceful partial failure), and a real-adapter integration test driving
+  `AirbnbAdapter` + `FirecrawlClient` + pipeline through a fixture transport.
+- **Schema:** the 5 migrations have been applied to a real Postgres 16 + pgvector
+  and verified (30 tables, 3 views, 76 indexes, seed data, the dedup constraint,
+  the `match_reviews` RAG function, and every upsert's unique constraint). To
+  re-verify against any Postgres: `DATABASE_URL=... ./scripts/apply-migrations.sh`.
+
 ## Getting started (planning-stage)
 1. Read [`docs/01-overview.md`](docs/01-overview.md) then [`docs/02-architecture.md`](docs/02-architecture.md).
 2. Review the schema in `supabase/migrations/` — it runs today against a fresh Supabase project.
