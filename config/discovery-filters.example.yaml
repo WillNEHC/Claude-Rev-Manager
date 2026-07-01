@@ -1,0 +1,44 @@
+# =============================================================================
+# GDIP Listing Discovery Filters
+# Configurable inclusion criteria (spec: entire homes, luxury, family, pet
+# friendly, superhost). "match_mode: all | most | any" controls strictness.
+# A listing is scored against these; those meeting the threshold are ingested.
+# =============================================================================
+
+profiles:
+  default:
+    # 'most' = pass if it meets the required set OR a majority of preferred.
+    match_mode: most
+    required:
+      entire_home: true            # hard requirement — never collect shared rooms
+    preferred:
+      luxury: true
+      family_oriented: true
+      pet_friendly: true
+      superhost: true
+    # Heuristics used to derive the boolean flags from scraped listing data.
+    heuristics:
+      luxury:
+        min_nightly_rate_usd: 400
+        keywords: [luxury, estate, waterfront, high-end, chef, designer]
+      family_oriented:
+        min_bedrooms: 3
+        keywords: [family, kids, crib, pack n play, bunk]
+      pet_friendly:
+        amenity_flags: [pets_allowed, dog_friendly]
+      superhost:
+        require_badge: true        # or equivalent (Vrbo Premier, Booking rating)
+    # Minimum fraction of 'preferred' that must pass when match_mode = most.
+    preferred_threshold: 0.5
+
+  # Example of a stricter acquisition-scouting profile.
+  acquisition_grade:
+    match_mode: all
+    required:
+      entire_home: true
+      luxury: true
+      superhost: true
+    preferred:
+      family_oriented: true
+      pet_friendly: true
+    preferred_threshold: 0.5

@@ -1,0 +1,35 @@
+{
+  "name": "gdip",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Guest Demand Intelligence Platform — market research for luxury NH short-term rentals.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "//": "Scripts are declared here as the intended surface. Implementations land in the build phase (see docs/10-roadmap.md).",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:migrate": "supabase db push",
+    "db:types": "supabase gen types typescript --local > src/lib/db/types.ts",
+    "markets:sync": "tsx src/jobs/sync-markets.ts",
+    "ingest": "tsx src/jobs/ingest.ts",
+    "extract": "tsx src/jobs/extract.ts",
+    "embed": "tsx src/jobs/embed.ts",
+    "trends": "tsx src/jobs/compute-trends.ts",
+    "recommend": "tsx src/jobs/generate-recommendations.ts",
+    "report": "tsx src/jobs/generate-report.ts",
+    "pipeline:monthly": "tsx src/jobs/monthly-pipeline.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "gdip": {
+    "note": "Dependency lists are intentionally empty at the planning stage. docs/02-architecture.md pins the chosen libraries (Next.js, @supabase/supabase-js, @anthropic-ai/sdk, zod, firecrawl SDK, vitest, pino). They are installed when the build phase begins."
+  }
+}

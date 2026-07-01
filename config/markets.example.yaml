@@ -1,0 +1,57 @@
+# =============================================================================
+# GDIP Market Definitions
+# Adding a market to V1+ means adding a block here — no code changes.
+# The `markets:sync` job upserts these into the `markets` table (migration 0005
+# seeds the same four so the DB works standalone).
+# =============================================================================
+
+defaults:
+  region: New Hampshire
+  history_window_months: 12          # spec default: 6-12
+  sources:                            # which ingestion adapters run for a market
+    - airbnb
+    - vrbo
+    - booking
+    - google
+    - reddit
+  discovery_filters_ref: default      # -> config/discovery-filters.example.yaml
+
+markets:
+  - slug: lake-winnipesaukee
+    name: Lake Winnipesaukee
+    center: { lat: 43.6406, lng: -71.3106 }
+    # Bounding radius (km) around center used to geo-scope discovery + places.
+    radius_km: 30
+    search_terms:
+      - "Lake Winnipesaukee vacation rental"
+      - "Winnipesaukee lakefront home"
+      - "Wolfeboro Meredith Gilford Laconia rental"
+    towns: [Wolfeboro, Meredith, Gilford, Laconia, Moultonborough, Alton]
+
+  - slug: squam-lake
+    name: Squam Lake
+    center: { lat: 43.7690, lng: -71.5440 }
+    radius_km: 20
+    search_terms:
+      - "Squam Lake vacation rental"
+      - "Holderness NH lakefront"
+    towns: [Holderness, Center Harbor, Sandwich, Ashland]
+
+  - slug: newfound-lake
+    name: Newfound Lake
+    center: { lat: 43.6640, lng: -71.7690 }
+    radius_km: 18
+    search_terms:
+      - "Newfound Lake vacation rental"
+      - "Bristol NH lakefront home"
+    towns: [Bristol, Bridgewater, Hebron, Alexandria]
+
+  - slug: lake-sunapee
+    name: Lake Sunapee
+    center: { lat: 43.3920, lng: -72.0510 }
+    radius_km: 22
+    search_terms:
+      - "Lake Sunapee vacation rental"
+      - "Sunapee lakefront home"
+      - "New London NH rental"
+    towns: [Sunapee, New London, Newbury]
