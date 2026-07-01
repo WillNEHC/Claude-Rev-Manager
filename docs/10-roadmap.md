@@ -9,7 +9,14 @@ phases.
 - **Exit:** stakeholder can read the blueprint and the schema runs on a fresh
   Supabase project.
 
-## Phase 1 — Data spine + one source (vertical slice)
+## Phase 1 — Data spine + one source (vertical slice) ✅
+*Status: implemented. Config loaders, logging, dedup hashing, the Firecrawl
+reliability wrapper, the `IngestRepository` (in-memory + Supabase), the Airbnb
+adapter, the ingestion pipeline, and the `markets:sync` / `ingest` jobs are in
+`src/`, with 26 passing tests and a clean typecheck. Deviation: the Next.js app
+scaffold is deferred to Phase 4 (the dashboard phase) to keep this slice focused
+on ingestion — the actual exit criterion.*
+
 - Install dependencies; scaffold Next.js app + `src/` modules.
 - `src/lib/db` (Supabase client + generated types), `src/lib/config` (Zod-validated
   loaders for markets.yaml / discovery-filters.yaml), `src/lib/logging` (Pino).

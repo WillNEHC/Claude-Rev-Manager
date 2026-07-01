@@ -8,28 +8,26 @@
     "node": ">=20"
   },
   "scripts": {
-    "//": "Scripts are declared here as the intended surface. Implementations land in the build phase (see docs/10-roadmap.md).",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "supabase db push",
-    "db:types": "supabase gen types typescript --local > src/lib/db/types.ts",
     "markets:sync": "tsx src/jobs/sync-markets.ts",
-    "ingest": "tsx src/jobs/ingest.ts",
-    "extract": "tsx src/jobs/extract.ts",
-    "embed": "tsx src/jobs/embed.ts",
-    "trends": "tsx src/jobs/compute-trends.ts",
-    "recommend": "tsx src/jobs/generate-recommendations.ts",
-    "report": "tsx src/jobs/generate-report.ts",
-    "pipeline:monthly": "tsx src/jobs/monthly-pipeline.ts"
+    "ingest": "tsx src/jobs/ingest.ts"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "pino": "^9.4.0",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "pino-pretty": "^11.2.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
+  },
   "gdip": {
-    "note": "Dependency lists are intentionally empty at the planning stage. docs/02-architecture.md pins the chosen libraries (Next.js, @supabase/supabase-js, @anthropic-ai/sdk, zod, firecrawl SDK, vitest, pino). They are installed when the build phase begins."
+    "note": "Phase 1 (data spine + Airbnb ingestion slice). The Firecrawl SDK (@mendable/firecrawl-js) and Anthropic SDK are added in their phases; Phase 1 keeps the Firecrawl call behind an injectable HTTP-ish interface so parsing/dedup/filtering logic is testable without network or keys. Next.js dashboard is scaffolded in Phase 4."
   }
 }
