@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdip.local/schemas/review-extraction.schema.json",
+  "title": "ReviewExtraction",
+  "description": "Structured extraction emitted by the AI pipeline for a single review. Mirrors review_extractions + the mention fan-out tables. Designed to be usable directly as an Anthropic structured-output schema: every object sets additionalProperties:false and required lists all keys; no numeric/string constraints are used (validated in code instead). Nullable fields use anyOf[type, null] to mean 'not mentioned'.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "trip_purpose": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+    "reasons_for_booking": { "type": "array", "items": { "type": "string" } },
+    "reasons_to_return": { "type": "array", "items": { "type": "string" } },
+    "reasons_not_to_return": { "type": "array", "items": { "type": "string" } },
+
+    "sentiment": {
+      "anyOf": [
+        { "type": "string", "enum": ["very_negative", "negative", "neutral", "positive", "very_positive"] },
+        { "type": "null" }
+      ]
+    },
+    "sentiment_score": { "anyOf": [{ "type": "number" }, { "type": "null" }], "description": "-1..1" },
+    "cleanliness_score": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+    "communication_score": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+    "checkin_score": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+    "value_score": { "anyOf": [{ "type": "number" }, { "type": "null" }] },
+
+    "has_operational_issue": { "type": "boolean" },
+    "has_maintenance_issue": { "type": "boolean" },
+    "has_unexpected_delight": { "type": "boolean" },
+    "is_exceptional": { "type": "boolean" },
+    "is_disappointment": { "type": "boolean" },
+
+    "memorable_moments": { "type": "array", "items": { "type": "string" } },
+    "exceptional_phrases": { "type": "array", "items": { "type": "string" } },
+    "disappointment_phrases": { "type": "array", "items": { "type": "string" } },
+    "hidden_gems": { "type": "array", "items": { "type": "string" } },
+
+    "amenity_mentions": {
+      "type": "array",
+      "description": "One per amenity referenced. amenity_slug is matched/created against the amenities dictionary in code.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amenity_slug": { "type": "string" },
+          "sentiment": { "type": "string", "enum": ["very_negative", "negative", "neutral", "positive", "very_positive"] },
+          "is_positive": { "type": "boolean" },
+          "is_negative": { "type": "boolean" },
+          "excerpt": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["amenity_slug", "sentiment", "is_positive", "is_negative", "excerpt", "confidence"]
+      }
+    },
+
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "category_slug": { "type": "string" },
+          "sentiment": { "type": "string", "enum": ["very_negative", "negative", "neutral", "positive", "very_positive"] },
+          "confidence": { "type": "number" },
+          "excerpt": { "type": "string" }
+        },
+        "required": ["category_slug", "sentiment", "confidence", "excerpt"]
+      }
+    },
+
+    "personas": {
+      "type": "array",
+      "description": "Assigned personas. Use an existing seed slug when it fits; propose a new slug only when none applies (promoted downstream once evidence supports it).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "persona_slug": { "type": "string" },
+          "is_emergent": { "type": "boolean" },
+          "confidence": { "type": "number" },
+          "excerpt": { "type": "string" }
+        },
+        "required": ["persona_slug", "is_emergent", "confidence", "excerpt"]
+      }
+    },
+
+    "operational_issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "issue_type": { "type": "string" },
+          "category_slug": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+          "severity": { "type": "integer", "description": "1-5, validated in code" },
+          "excerpt": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["issue_type", "category_slug", "severity", "excerpt", "confidence"]
+      }
+    },
+
+    "guest_delighters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "delighter_type": { "type": "string" },
+          "amenity_slug": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+          "excerpt": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["delighter_type", "amenity_slug", "excerpt", "confidence"]
+      }
+    },
+
+    "place_mentions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "raw_name": { "type": "string" },
+          "place_type": { "type": "string", "enum": ["restaurant", "coffee", "brewery", "attraction", "event", "wedding_venue", "other"] },
+          "sentiment": { "type": "string", "enum": ["very_negative", "negative", "neutral", "positive", "very_positive"] },
+          "excerpt": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["raw_name", "place_type", "sentiment", "excerpt", "confidence"]
+      }
+    },
+
+    "extraction_confidence": { "type": "number", "description": "0..1 self-assessed certainty for this whole record" }
+  },
+  "required": [
+    "trip_purpose", "reasons_for_booking", "reasons_to_return", "reasons_not_to_return",
+    "sentiment", "sentiment_score", "cleanliness_score", "communication_score", "checkin_score", "value_score",
+    "has_operational_issue", "has_maintenance_issue", "has_unexpected_delight", "is_exceptional", "is_disappointment",
+    "memorable_moments", "exceptional_phrases", "disappointment_phrases", "hidden_gems",
+    "amenity_mentions", "categories", "personas", "operational_issues", "guest_delighters", "place_mentions",
+    "extraction_confidence"
+  ]
+}

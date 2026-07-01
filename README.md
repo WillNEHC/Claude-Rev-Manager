@@ -58,6 +58,12 @@ src/                    (Build phase) Next.js app, ingestion adapters, jobs, AI 
 | [09 — Reports](docs/09-reports.md) | Monthly report structure & generation |
 | [10 — Roadmap](docs/10-roadmap.md) | Phased build plan & future enhancements |
 | [11 — Evidence standards](docs/11-evidence-standards.md) | Confidence, citations, anti-bias rules |
+| [12 — Cost & operations](docs/12-cost-and-operations.md) | Run-cost model, cost-control levers, guardrails |
+| [13 — API surface](docs/13-api-surface.md) | Dashboard/API endpoint contract |
+| [14 — Metrics & worked example](docs/14-metrics-and-worked-example.md) | Trend metric catalog + review→recommendation trace |
+| [15 — Decisions & risks](docs/15-decisions-and-risks.md) | Decision log, open questions, risks (incl. ToS) |
+
+A concrete extraction contract lives at [`docs/schemas/review-extraction.schema.json`](docs/schemas/review-extraction.schema.json).
 
 ## Getting started (planning-stage)
 1. Read [`docs/01-overview.md`](docs/01-overview.md) then [`docs/02-architecture.md`](docs/02-architecture.md).
