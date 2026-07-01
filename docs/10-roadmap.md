@@ -46,7 +46,19 @@ queue view) verified end to end.*
 - **Exit:** reviews flow into `review_extractions` + all mention tables + vectors;
   invalid outputs quarantined, not written.
 
-## Phase 3 — Intelligence engines + scheduling
+## Phase 3 — Intelligence engines + scheduling ✅
+*Status: implemented. `src/engines` (trends, expectation index, opportunities,
+market comparison, scoring, recommendations with priority + ROI + month-over-month
+history, the orchestration pipeline, and the EngineRepository that enforces the
+evidence invariant), the Supabase analytics source + engine repository, migration
+0007 (amenity_stats/category_stats SQL functions + rec_key), the monthly-pipeline
+job, and the GitHub Actions monthly scheduler. 64 passing tests incl. trend math,
+expectation classification, opportunity detection, priority ordering, ROI, history
+transitions, and the evidence-invariant guard. Migrations 0001–0007 apply to real
+Postgres 16 + pgvector; the SQL aggregation functions and the full engine write
+path (trends + opportunities + recommendations + evidence + history) verified end
+to end. Scheduler decision (O2): GitHub Actions.*
+
 - `src/engines`: trends, expectation index, opportunities, market comparison,
   recommendations (+ evidence attachment, priority scoring, history).
 - Jobs: `trends`, `recommend`, `monthly-pipeline`; wire the scheduler

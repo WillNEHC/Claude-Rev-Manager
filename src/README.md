@@ -57,7 +57,33 @@ npm run extract -- 200   # needs ANTHROPIC_API_KEY
 npm run embed -- 200     # needs OPENAI_API_KEY
 ```
 
+## Implemented — Phase 3 (intelligence engines + scheduling)
+```
+src/engines/
+  types.ts            aggregate inputs + evidence-bearing outputs
+  analytics.ts        AnalyticsSource interface + in-memory impl
+  trends.ts           period-over-period diffs -> trend points
+  expectation-index.ts  data-driven table_stakes vs delight
+  opportunities.ts    amenity-gap detection with demand evidence
+  compare.ts          per-market profile insights
+  scoring.ts          config-weighted priority score
+  recommend.ts        opportunities -> ranked recs + ROI + month-over-month history
+  repository.ts       EngineRepository (enforces the evidence invariant) + in-memory
+  pipeline.ts         runMonthlyPipeline (orchestrates all engines)
+src/lib/db/
+  supabase-analytics.ts          calls the SQL aggregation functions
+  supabase-engine-repository.ts  persists trends/opps/insights/recs + evidence + history
+src/jobs/monthly-pipeline.ts     the scheduled engine run
+.github/workflows/monthly-intelligence.yml  monthly cron (ingest->extract->embed->engines)
+```
+Migration `0007` adds the `amenity_stats` / `category_stats` SQL aggregation
+functions and a `rec_key` column for recommendation diffing. The evidence
+invariant is structural: persisting an opportunity/insight/recommendation with
+no evidence throws `MissingEvidenceError`. Live run:
+```
+npm run pipeline:monthly -- 2026-06-01   # needs SUPABASE_* 
+```
+
 ## Not yet built
-- `engines/` — trends, opportunities, recommendations (Phase 3)
 - `reports/`, `app/` (Next.js dashboard + API) — Phase 4
 - Additional adapters (Vrbo, Booking, Google, Reddit…) — Phase 5

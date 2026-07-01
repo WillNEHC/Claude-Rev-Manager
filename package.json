@@ -14,7 +14,8 @@
     "markets:sync": "tsx src/jobs/sync-markets.ts",
     "ingest": "tsx src/jobs/ingest.ts",
     "extract": "tsx src/jobs/extract.ts",
-    "embed": "tsx src/jobs/embed.ts"
+    "embed": "tsx src/jobs/embed.ts",
+    "pipeline:monthly": "tsx src/jobs/monthly-pipeline.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
