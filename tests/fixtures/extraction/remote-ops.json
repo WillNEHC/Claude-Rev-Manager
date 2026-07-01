@@ -1,0 +1,46 @@
+{
+  "review": "Booked this for a fall foliage photography trip. Wifi kept dropping which was frustrating, and the hot tub was broken on arrival. Dinner at the Canoe Club was a highlight though.",
+  "expected": {
+    "trip_purpose": "fall foliage photography trip",
+    "reasons_for_booking": ["fall foliage photography"],
+    "reasons_to_return": [],
+    "reasons_not_to_return": ["wifi kept dropping", "hot tub was broken"],
+    "sentiment": "negative",
+    "sentiment_score": -0.3,
+    "cleanliness_score": null,
+    "communication_score": null,
+    "checkin_score": null,
+    "value_score": null,
+    "has_operational_issue": true,
+    "has_maintenance_issue": true,
+    "has_unexpected_delight": false,
+    "is_exceptional": false,
+    "is_disappointment": true,
+    "memorable_moments": [],
+    "exceptional_phrases": [],
+    "disappointment_phrases": ["Wifi kept dropping which was frustrating", "the hot tub was broken on arrival"],
+    "hidden_gems": [],
+    "amenity_mentions": [
+      { "amenity_slug": "fast_wifi", "sentiment": "negative", "is_positive": false, "is_negative": true, "excerpt": "Wifi kept dropping", "confidence": 0.9 },
+      { "amenity_slug": "hot_tub", "sentiment": "very_negative", "is_positive": false, "is_negative": true, "excerpt": "the hot tub was broken on arrival", "confidence": 0.9 }
+    ],
+    "categories": [
+      { "category_slug": "technology", "sentiment": "negative", "confidence": 0.9, "excerpt": "Wifi kept dropping" },
+      { "category_slug": "maintenance", "sentiment": "negative", "confidence": 0.9, "excerpt": "hot tub was broken" },
+      { "category_slug": "restaurants", "sentiment": "positive", "confidence": 0.8, "excerpt": "Dinner at the Canoe Club was a highlight" }
+    ],
+    "personas": [
+      { "persona_slug": "photographers", "is_emergent": true, "confidence": 0.8, "excerpt": "photography trip" },
+      { "persona_slug": "seasonal_visitors", "is_emergent": false, "confidence": 0.7, "excerpt": "fall foliage" }
+    ],
+    "operational_issues": [
+      { "issue_type": "wifi_dropping", "category_slug": "technology", "severity": 3, "excerpt": "Wifi kept dropping", "confidence": 0.9 },
+      { "issue_type": "hot_tub_broken", "category_slug": "maintenance", "severity": 4, "excerpt": "the hot tub was broken on arrival", "confidence": 0.9 }
+    ],
+    "guest_delighters": [],
+    "place_mentions": [
+      { "raw_name": "Canoe Club", "place_type": "restaurant", "sentiment": "positive", "excerpt": "Dinner at the Canoe Club was a highlight", "confidence": 0.85 }
+    ],
+    "extraction_confidence": 0.82
+  }
+}

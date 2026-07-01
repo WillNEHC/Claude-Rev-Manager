@@ -28,7 +28,17 @@ on ingestion — the actual exit criterion.*
   fixtures.
 - **Exit:** real deduplicated listings + reviews for one market from one source.
 
-## Phase 2 — AI extraction + embeddings
+## Phase 2 — AI extraction + embeddings ✅
+*Status: implemented. `src/ai` (Zod contract, prompts, Anthropic extractor,
+embedding provider, extract + embed pipelines), the extraction repository
+(in-memory + Supabase), migration 0006 (extraction_failures quarantine +
+reviews_needing_embedding view), and the extract/embed jobs are in place. 45
+passing tests incl. schema validation against golden fixtures, quarantine of
+invalid/errored output, mention fan-out, and idempotent embedding. Migrations
+0001–0006 apply cleanly to real Postgres 16 + pgvector and the full write path
+(extraction row + all mention tables + is_processed flip + pgvector embed +
+queue view) verified end to end.*
+
 - `src/ai`: extraction (Claude tool-use + Zod validation), persona/category
   classification, chunk + embed.
 - Job: `extract`, `embed`. Extraction state machine (`is_processed`).

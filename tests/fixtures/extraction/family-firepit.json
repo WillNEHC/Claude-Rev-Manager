@@ -1,0 +1,42 @@
+{
+  "review": "Beautiful home and the dock was perfect for the kids. Only wish there'd been a fire pit for evenings — we saw one at a place on Winni last year and the kids loved s'mores. Host was super responsive and the kitchen was spotless.",
+  "expected": {
+    "trip_purpose": "family lake vacation",
+    "reasons_for_booking": ["lakefront home with a dock for the kids"],
+    "reasons_to_return": [],
+    "reasons_not_to_return": [],
+    "sentiment": "positive",
+    "sentiment_score": 0.6,
+    "cleanliness_score": 0.9,
+    "communication_score": 0.9,
+    "checkin_score": null,
+    "value_score": null,
+    "has_operational_issue": false,
+    "has_maintenance_issue": false,
+    "has_unexpected_delight": false,
+    "is_exceptional": false,
+    "is_disappointment": false,
+    "memorable_moments": ["the kids loved the dock"],
+    "exceptional_phrases": [],
+    "disappointment_phrases": ["Only wish there'd been a fire pit"],
+    "hidden_gems": [],
+    "amenity_mentions": [
+      { "amenity_slug": "private_dock", "sentiment": "very_positive", "is_positive": true, "is_negative": false, "excerpt": "the dock was perfect for the kids", "confidence": 0.95 },
+      { "amenity_slug": "fire_pit", "sentiment": "negative", "is_positive": false, "is_negative": true, "excerpt": "wish there'd been a fire pit", "confidence": 0.85 },
+      { "amenity_slug": "stocked_kitchen", "sentiment": "positive", "is_positive": true, "is_negative": false, "excerpt": "the kitchen was spotless", "confidence": 0.8 }
+    ],
+    "categories": [
+      { "category_slug": "outdoor_experience", "sentiment": "positive", "confidence": 0.9, "excerpt": "the dock was perfect" },
+      { "category_slug": "family_experience", "sentiment": "positive", "confidence": 0.85, "excerpt": "perfect for the kids" },
+      { "category_slug": "communication", "sentiment": "positive", "confidence": 0.85, "excerpt": "Host was super responsive" },
+      { "category_slug": "cleanliness", "sentiment": "positive", "confidence": 0.8, "excerpt": "the kitchen was spotless" }
+    ],
+    "personas": [
+      { "persona_slug": "families", "is_emergent": false, "confidence": 0.95, "excerpt": "perfect for the kids" }
+    ],
+    "operational_issues": [],
+    "guest_delighters": [],
+    "place_mentions": [],
+    "extraction_confidence": 0.88
+  }
+}

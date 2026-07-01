@@ -33,8 +33,31 @@ npm run markets:sync
 npm run ingest -- squam-lake airbnb
 ```
 
+## Implemented — Phase 2 (AI extraction + embeddings)
+```
+src/
+  ai/
+    schema.ts    Zod extraction contract (mirrors review_extractions + mentions)
+    prompt.ts    Extraction system/user prompts with taxonomy hints
+    extract.ts   LlmExtractor interface + AnthropicExtractor + JSON parsing
+    embed.ts     chunkText + EmbeddingProvider (OpenAI) interface
+    pipeline.ts  runExtraction (validate -> persist | quarantine) + runEmbedding
+  lib/db/
+    extraction-repository.ts           interface + in-memory impl
+    supabase-extraction-repository.ts  live impl (slug resolution + fan-out)
+  jobs/
+    extract.ts   extract — process the unprocessed-review queue
+    embed.ts     embed — chunk + embed reviews into pgvector
+```
+Migration `0006` adds the `extraction_failures` quarantine table and the
+`reviews_needing_embedding` queue view. Extraction is one structured LLM pass;
+invalid outputs are quarantined (never written). Live run:
+```
+npm run extract -- 200   # needs ANTHROPIC_API_KEY
+npm run embed -- 200     # needs OPENAI_API_KEY
+```
+
 ## Not yet built
-- `ai/` — extraction, classification, embeddings (Phase 2)
 - `engines/` — trends, opportunities, recommendations (Phase 3)
 - `reports/`, `app/` (Next.js dashboard + API) — Phase 4
 - Additional adapters (Vrbo, Booking, Google, Reddit…) — Phase 5

@@ -12,9 +12,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "markets:sync": "tsx src/jobs/sync-markets.ts",
-    "ingest": "tsx src/jobs/ingest.ts"
+    "ingest": "tsx src/jobs/ingest.ts",
+    "extract": "tsx src/jobs/extract.ts",
+    "embed": "tsx src/jobs/embed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
     "@supabase/supabase-js": "^2.45.4",
     "pino": "^9.4.0",
     "yaml": "^2.5.1",
