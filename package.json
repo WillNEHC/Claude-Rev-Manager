@@ -9,8 +9,12 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "typecheck:app": "tsc --noEmit -p tsconfig.app.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "markets:sync": "tsx src/jobs/sync-markets.ts",
     "ingest": "tsx src/jobs/ingest.ts",
     "extract": "tsx src/jobs/extract.ts",
@@ -20,12 +24,17 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
     "@supabase/supabase-js": "^2.45.4",
+    "next": "^14.2.15",
     "pino": "^9.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "yaml": "^2.5.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
     "pino-pretty": "^11.2.2",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",

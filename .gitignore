@@ -35,3 +35,7 @@ npm-debug.log*
 # Supabase local
 supabase/.branches
 supabase/.temp
+
+# Next.js generated
+next-env.d.ts
+*.tsbuildinfo

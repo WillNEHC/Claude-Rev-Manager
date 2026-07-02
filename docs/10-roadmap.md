@@ -68,7 +68,19 @@ to end. Scheduler decision (O2): GitHub Actions.*
 - **Exit:** a full monthly pipeline run produces ranked, evidence-backed
   recommendations.
 
-## Phase 4 — Dashboard + RAG + reports
+## Phase 4 — Dashboard + RAG + reports ✅
+*Status: implemented. `src/rag` (router, retriever, grounded synthesizer, answer
+pipeline with the insufficient-evidence guard), `src/reports` (assembly + HTML
+render + DB build), `src/api` (Zod-validated handlers + search handler), the
+Supabase retriever + dashboard repository, and a Next.js App Router dashboard
+(Overview, Recommendations, Ask/RAG, Evidence browser, Compare + API routes).
+83 passing tests incl. question routing, RAG grounding + the insufficient-evidence
+path (no LLM call on an empty well), report assembly/render/escaping, and API
+param validation. Core typecheck clean, app typechecks separately, and
+`next build` compiles all routes + pages. Remaining for live: browser verification
+against real ingested data. Charts on the Trends screen are deferred (see
+future roadmap).*
+
 - Next.js screens (Overview, Review/Amenity Explorer, Trends, Recommendations,
   Evidence Browser, Market Comparison, Monthly Comparison).
 - RAG endpoint + question router; semantic search UI with evidence panel.

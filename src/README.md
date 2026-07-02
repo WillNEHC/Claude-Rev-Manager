@@ -84,6 +84,22 @@ no evidence throws `MissingEvidenceError`. Live run:
 npm run pipeline:monthly -- 2026-06-01   # needs SUPABASE_* 
 ```
 
+## Implemented — Phase 4 (dashboard + RAG + reports)
+```
+src/rag/       router (structured/semantic/hybrid) · retriever iface + in-memory ·
+               grounded synthesizer · answer pipeline (insufficient-evidence guard)
+src/reports/   generate (section assembly + confidence summary) · render (HTML) · build (from DB)
+src/api/       Zod-validated handlers + DashboardRepository iface + in-memory + search handler
+src/lib/db/    supabase-retriever · supabase-dashboard-repository
+src/app/       Next.js App Router: layout + Overview / Recommendations / Ask (RAG) /
+               Evidence / Compare pages, and /api routes wrapping the tested handlers
+```
+The RAG pipeline refuses to answer from an empty well (returns "insufficient
+evidence" without calling the LLM). The Next app builds cleanly (`npm run build`);
+core logic is unit-tested (`npm test`), the app is typechecked separately
+(`npm run typecheck:app`). Live run needs `npm install` then `npm run dev`
+(requires SUPABASE_* + ANTHROPIC/OPENAI keys). Report export:
+`GET /api/reports?market=squam-lake&month=2026-06-01`.
+
 ## Not yet built
-- `reports/`, `app/` (Next.js dashboard + API) — Phase 4
 - Additional adapters (Vrbo, Booking, Google, Reddit…) — Phase 5
