@@ -1,0 +1,16 @@
+{
+  "url": "https://www.vrbo.com/en-us/cabin-rental/p1234567",
+  "title": "Premier Lakefront Retreat on Winnipesaukee",
+  "propertyType": "Cabin",
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "sleeps": 6,
+  "averageRate": 520,
+  "rating": 4.8,
+  "reviewCount": 41,
+  "isPremierHost": true,
+  "amenities": ["Fast wifi", "Dog friendly", "Kayaks", "Fire pit"],
+  "description": "A luxury family waterfront cabin with a private dock.",
+  "hostName": "Pat",
+  "hostId": "vh-77"
+}

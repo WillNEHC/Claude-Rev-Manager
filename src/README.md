@@ -101,5 +101,27 @@ core logic is unit-tested (`npm test`), the app is typechecked separately
 (requires SUPABASE_* + ANTHROPIC/OPENAI keys). Report export:
 `GET /api/reports?market=squam-lake&month=2026-06-01`.
 
-## Not yet built
-- Additional adapters (Vrbo, Booking, Google, Reddit…) — Phase 5
+## Implemented — Phase 5 (sources + hardening)
+```
+src/ingestion/adapters/  shared.ts (common helpers) · vrbo.ts · booking.ts
+src/monitoring/          health.ts (evaluateHealth) · sink.ts (logger/webhook alerts)
+src/enrichment/          revenue.ts (RevenueEnrichmentProvider + PriceLabs) · enrich.ts
+src/ingestion/backfill.ts  drainQueue (bounded, resumable queue drainer)
+src/lib/db/              supabase-enrichment-repository.ts
+src/jobs/                enrich · backfill · monitor
+```
+Migration `0008` adds hot-path indexes, a partial unique index making
+market-level (listing_id null) snapshots idempotent, and a
+`reindex_review_embeddings()` maintenance function. The scheduler now ingests
+airbnb + vrbo + booking per market and runs enrich + monitor steps.
+- Vrbo maps "Premier Host" → superhost; Booking normalizes its 0–10 score to
+  0–5 and treats ≥ 9.0 as the superhost equivalent. Cross-source dedup works
+  because `source` is in the content hash.
+- Monitoring: `evaluateHealth` → alerts (crawl failures, no-reviews-found,
+  extraction failure rate, Firecrawl budget) to a webhook or the log.
+- PriceLabs enrichment is interface-first and enrichment-only in V1 (the response
+  mapping needs verifying against the live API).
+
+## Review-only sources (Google, Reddit, forums) — future path
+The `SourceAdapter` interface is listing-oriented; review-only sources need a
+market-level review ingestion path (noted in the backfill job). Deferred.

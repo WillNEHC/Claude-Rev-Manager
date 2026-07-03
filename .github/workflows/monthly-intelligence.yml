@@ -31,6 +31,7 @@ jobs:
       FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PRICELABS_API_KEY: ${{ secrets.PRICELABS_API_KEY }}
       NODE_ENV: production
       LOG_LEVEL: info
     steps:
@@ -44,14 +45,23 @@ jobs:
         run: npm run typecheck && npm test
       - name: Sync markets
         run: npm run markets:sync
-      - name: Ingest (each active market)
+      - name: Ingest (each active market × source)
         run: |
           for m in lake-winnipesaukee squam-lake newfound-lake lake-sunapee; do
-            npm run ingest -- "$m" airbnb || echo "ingest failed for $m (continuing)"
+            for s in airbnb vrbo booking; do
+              npm run ingest -- "$m" "$s" || echo "ingest failed for $m/$s (continuing)"
+            done
           done
       - name: Extract
         run: npm run extract -- 1000
       - name: Embed
         run: npm run embed -- 1000
+      - name: Enrich (revenue context)
+        run: npm run enrich -- "${{ github.event.inputs.report_month }}"
       - name: Run intelligence engines
         run: npm run pipeline:monthly -- "${{ github.event.inputs.report_month }}"
+      - name: Monitor / alert
+        if: always()
+        env:
+          GDIP_ALERT_WEBHOOK: ${{ secrets.GDIP_ALERT_WEBHOOK }}
+        run: npm run monitor

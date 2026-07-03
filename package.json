@@ -19,6 +19,9 @@
     "ingest": "tsx src/jobs/ingest.ts",
     "extract": "tsx src/jobs/extract.ts",
     "embed": "tsx src/jobs/embed.ts",
+    "enrich": "tsx src/jobs/enrich.ts",
+    "backfill": "tsx src/jobs/backfill.ts",
+    "monitor": "tsx src/jobs/monitor.ts",
     "pipeline:monthly": "tsx src/jobs/monthly-pipeline.ts"
   },
   "dependencies": {

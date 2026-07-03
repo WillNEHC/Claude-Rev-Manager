@@ -89,7 +89,21 @@ future roadmap).*
   context; "insufficient evidence" path).
 - **Exit:** the operator can explore, ask questions, and export monthly reports.
 
-## Phase 5 — Add remaining sources + harden
+## Phase 5 — Add remaining sources + harden ✅
+*Status: implemented. Vrbo + Booking.com adapters (shared helpers; Premier Host
+and 0–10-score→superhost-equivalent mappings) wired into ingest/backfill;
+monitoring (evaluateHealth + logger/webhook alert sinks + monitor job); PriceLabs
+revenue enrichment (interface + provider + enrich job, enrichment-only);
+backfill tooling (bounded drainQueue + backfill job with cost ceilings); and
+migration 0008 (hot-path indexes, partial unique index for market snapshots, IVFFlat
+reindex function). Scheduler ingests airbnb+vrbo+booking and runs enrich + monitor.
+107 passing tests incl. new-adapter parsing, cross-source dedup, health rules,
+webhook sink, enrichment mapping + run, and the bounded drainer. Migrations
+0001–0008 apply to real Postgres 16 + pgvector; the partial unique index and
+reindex function verified.
+Remaining (future): review-only sources (Google/Reddit/forums) need a
+market-level review path; live browser + end-to-end runs against real data.*
+
 - Adapters: Vrbo, Booking.com, Google, Reddit, forums/blogs (each behind the same
   interface).
 - PriceLabs enrichment into snapshots + ROI models.

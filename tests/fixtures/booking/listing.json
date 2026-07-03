@@ -1,0 +1,13 @@
+{
+  "url": "https://www.booking.com/hotel/us/squam-lakeside-lodge.html",
+  "title": "Squam Lakeside Lodge",
+  "propertyType": "Entire home",
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "maxOccupancy": 8,
+  "price": 610,
+  "reviewScore": 9.4,
+  "reviewCount": 88,
+  "amenities": ["Free WiFi", "Pet friendly", "Lake view"],
+  "description": "Luxury family lodge steps from Squam Lake."
+}

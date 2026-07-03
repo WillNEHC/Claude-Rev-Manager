@@ -13,6 +13,8 @@ import { createServiceClient } from "../lib/db/client";
 import { SupabaseRepository } from "../lib/db/supabase-repository";
 import { FirecrawlClient } from "../lib/firecrawl/client";
 import { AirbnbAdapter } from "../ingestion/adapters/airbnb";
+import { VrboAdapter } from "../ingestion/adapters/vrbo";
+import { BookingAdapter } from "../ingestion/adapters/booking";
 import { runIngestion } from "../ingestion/pipeline";
 import type { SourceAdapter } from "../ingestion/types";
 import type { PlatformSource } from "../lib/config/schema";
@@ -22,8 +24,12 @@ function buildAdapter(source: PlatformSource, fc: FirecrawlClient): SourceAdapte
   switch (source) {
     case "airbnb":
       return new AirbnbAdapter(fc);
+    case "vrbo":
+      return new VrboAdapter(fc);
+    case "booking":
+      return new BookingAdapter(fc);
     default:
-      throw new Error(`No adapter implemented for source '${source}' yet (Phase 5 adds more)`);
+      throw new Error(`No adapter implemented for source '${source}' yet`);
   }
 }
 
