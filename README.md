@@ -62,6 +62,7 @@ src/                    (Build phase) Next.js app, ingestion adapters, jobs, AI 
 | [13 — API surface](docs/13-api-surface.md) | Dashboard/API endpoint contract |
 | [14 — Metrics & worked example](docs/14-metrics-and-worked-example.md) | Trend metric catalog + review→recommendation trace |
 | [15 — Decisions & risks](docs/15-decisions-and-risks.md) | Decision log, open questions, risks (incl. ToS) |
+| [16 — Data sourcing](docs/16-data-sourcing.md) | ToS-clean intake: your own reviews + public web research + PriceLabs |
 
 A concrete extraction contract lives at [`docs/schemas/review-extraction.schema.json`](docs/schemas/review-extraction.schema.json).
 

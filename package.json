@@ -17,6 +17,7 @@
     "start": "next start",
     "markets:sync": "tsx src/jobs/sync-markets.ts",
     "ingest": "tsx src/jobs/ingest.ts",
+    "research": "tsx src/jobs/research.ts",
     "extract": "tsx src/jobs/extract.ts",
     "embed": "tsx src/jobs/embed.ts",
     "enrich": "tsx src/jobs/enrich.ts",
