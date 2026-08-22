@@ -1,0 +1,67 @@
+# Monthly Intelligence Pipeline (scheduler — roadmap decision O2)
+#
+# Runs the full monthly chain: ingest new listings/reviews -> extract -> embed
+# -> run the intelligence engines. Each step is idempotent and incremental, so a
+# re-run is safe. Secrets are configured in the repo/Environment settings.
+#
+# Manual runs: Actions tab -> "Monthly Intelligence" -> Run workflow.
+name: Monthly Intelligence
+
+on:
+  schedule:
+    # 06:00 UTC on the 1st of each month.
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+    inputs:
+      report_month:
+        description: "Report month (YYYY-MM-01). Defaults to the current month."
+        required: false
+
+concurrency:
+  group: monthly-intelligence
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PRICELABS_API_KEY: ${{ secrets.PRICELABS_API_KEY }}
+      NODE_ENV: production
+      LOG_LEVEL: info
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Typecheck & test
+        run: npm run typecheck && npm test
+      - name: Sync markets
+        run: npm run markets:sync
+      - name: Ingest (each active market × source)
+        run: |
+          for m in lake-winnipesaukee squam-lake newfound-lake lake-sunapee; do
+            for s in airbnb vrbo booking; do
+              npm run ingest -- "$m" "$s" || echo "ingest failed for $m/$s (continuing)"
+            done
+          done
+      - name: Extract
+        run: npm run extract -- 1000
+      - name: Embed
+        run: npm run embed -- 1000
+      - name: Enrich (revenue context)
+        run: npm run enrich -- "${{ github.event.inputs.report_month }}"
+      - name: Run intelligence engines
+        run: npm run pipeline:monthly -- "${{ github.event.inputs.report_month }}"
+      - name: Monitor / alert
+        if: always()
+        env:
+          GDIP_ALERT_WEBHOOK: ${{ secrets.GDIP_ALERT_WEBHOOK }}
+        run: npm run monitor

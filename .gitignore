@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Data & caches (raw crawl payloads, embeddings caches, local dumps)
+data/raw/
+data/cache/
+*.dump
+*.sqlite
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Supabase local
+supabase/.branches
+supabase/.temp
+
+# Next.js generated
+next-env.d.ts
+*.tsbuildinfo

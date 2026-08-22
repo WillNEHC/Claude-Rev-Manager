@@ -1,0 +1,50 @@
+# =============================================================================
+# GDIP Taxonomy — categories & seed personas
+# Mirrors what migration 0005 seeds. Edit here + run the taxonomy sync (Phase 2)
+# to evolve the classification vocabulary without code changes. The AI pipeline
+# classifies reviews into these; emergent personas are proposed by the pipeline
+# and promoted once evidence supports them (they are NOT listed here until then).
+# =============================================================================
+
+categories:
+  # Top-level standardized review categories.
+  - { slug: amenities,          name: Amenities }
+  - { slug: guest_experience,   name: Guest Experience }
+  - { slug: host,               name: Host }
+  - { slug: communication,      name: Communication }
+  - { slug: cleanliness,        name: Cleanliness }
+  - { slug: design,             name: Design }
+  - { slug: outdoor_experience, name: Outdoor Experience }
+  - { slug: location,           name: Location }
+  - { slug: restaurants,        name: Restaurants }
+  - { slug: activities,         name: Activities }
+  - { slug: events,             name: Events }
+  - { slug: maintenance,        name: Maintenance }
+  - { slug: parking,            name: Parking }
+  - { slug: technology,         name: Technology }
+  - { slug: value,              name: Value }
+  - { slug: family_experience,  name: Family Experience }
+  - { slug: luxury,             name: Luxury }
+  - { slug: accessibility,      name: Accessibility }
+  - { slug: pets,               name: Pets }
+  # Example sub-categories (parent -> children).
+  - { slug: dock,        name: Dock,        parent: outdoor_experience }
+  - { slug: lake_access, name: Lake Access, parent: outdoor_experience }
+  - { slug: beach,       name: Beach,       parent: outdoor_experience }
+
+seed_personas:
+  - { slug: families,           name: Families }
+  - { slug: couples,            name: Couples }
+  - { slug: wedding_guests,     name: Wedding Guests }
+  - { slug: luxury_travelers,   name: Luxury Travelers }
+  - { slug: pet_owners,         name: Pet Owners }
+  - { slug: remote_workers,     name: Remote Workers }
+  - { slug: business_travelers, name: Business Travelers }
+  - { slug: fishing_groups,     name: Fishing Groups }
+  - { slug: boating_groups,     name: Boating Groups }
+  - { slug: friends_trips,      name: Friends Trips }
+  - { slug: multigen_families,  name: Multi-Generational Families }
+  - { slug: seasonal_visitors,  name: Seasonal Visitors }
+
+# Promotion threshold for emergent personas (evidence_count before is_confirmed).
+emergent_persona_promotion_threshold: 25

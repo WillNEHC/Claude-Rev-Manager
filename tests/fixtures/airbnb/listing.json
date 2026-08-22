@@ -1,0 +1,19 @@
+{
+  "id": "1234567",
+  "url": "https://www.airbnb.com/rooms/1234567",
+  "title": "Luxury Lakefront Estate on Squam with Private Dock",
+  "propertyType": "Entire home",
+  "bedrooms": 4,
+  "bathrooms": 3,
+  "guests": 8,
+  "price": 750,
+  "rating": 4.94,
+  "reviewsCount": 62,
+  "latitude": 43.769,
+  "longitude": -71.544,
+  "isSuperhost": true,
+  "amenities": ["Fast wifi", "Dog friendly", "Private dock", "Fire pit", "Full kitchen"],
+  "description": "A high-end designer waterfront home perfect for families. Kids love the dock.",
+  "hostName": "Dana",
+  "hostId": "host-9001"
+}
