@@ -1,0 +1,69 @@
+================================================================================================
+NEHC REVENUE — computed from PriceLabs bookings (status: booked). Generated 2026-09-15
+Occupancy = booked nights / calendar nights. Nights split across month boundaries.
+================================================================================================
+
+### 183 Flagstone, Nashua NH  (3BR)   first reservation: Jan 2026   stays: 54
+Month      Nts  Avail   Occ%    Revenue      ADR   RevPAR
+Jan 2026   10     23    43%      2,487      249      108
+Feb 2026   12     28    43%      2,534      211       90
+Mar 2026   20     31    65%      4,546      227      147
+Apr 2026   19     30    63%      4,467      235      149
+May 2026   19     31    61%      5,297      279      171
+Jun 2026   26     30    87%      9,124      351      304
+Jul 2026   24     31    77%      8,105      338      261
+Aug 2026   28     31    90%      8,322      297      268
+Sep 2026   19     30    63%      5,423      285      181  (partial)
+Oct 2026   20     31    65%      6,552      328      211  (forward)
+Nov 2026    4     30    13%      1,558      390       52  (forward)
+Dec 2026    7     31    23%      1,789      256       58  (forward)
+  → completed stays 45 | nights 169 | revenue $47,656 | ADR $282 | avg LOS 3.8 nts | avg lead 31 d
+  → channel mix: airbnb: 46 ($52,228) · vrbo: 6 ($6,454) · direct: 2 ($1,521)
+
+### 672 Amory, Manchester NH  (4BR)   first reservation: Dec 2025   stays: 49
+Month      Nts  Avail   Occ%    Revenue      ADR   RevPAR
+Dec 2025    3      3   100%        939      313      313
+Jan 2026   18     31    58%      5,164      287      167
+Feb 2026   11     28    39%      4,140      376      148
+Mar 2026   26     31    84%      6,643      256      214
+Apr 2026   24     30    80%      6,352      265      212
+May 2026   22     31    71%      8,186      372      264
+Jun 2026   24     30    80%     10,005      417      333
+Jul 2026   29     31    94%     11,396      393      368
+Aug 2026   20     31    65%      9,792      490      316
+Sep 2026   22     30    73%      7,283      331      243  (partial)
+Oct 2026   11     31    35%      5,362      487      173  (forward)
+Nov 2026    3     30    10%      1,512      504       50  (forward)
+Jan 2027    3     31    10%      1,512      504       49  (forward)
+  → completed stays 40 | nights 182 | revenue $64,552 | ADR $355 | avg LOS 4.5 nts | avg lead 45 d
+  → channel mix: airbnb: 46 ($72,502) · vrbo: 2 ($5,061) · booking: 1 ($722)
+
+### 61 Pleasant, Ludlow VT  (3BR)   first reservation: Feb 2026   stays: 4
+Month      Nts  Avail   Occ%    Revenue      ADR   RevPAR
+Feb 2026    5     15    33%      2,894      579      193
+Dec 2026    6     31    19%      2,778      463       90  (forward)
+Feb 2027    1     28     4%        402      402       14  (forward)
+Mar 2027    5     31    16%      2,009      402       65  (forward)
+  → completed stays 2 | nights 5 | revenue $2,894 | ADR $579 | avg LOS 2.5 nts | avg lead 6 d
+  → channel mix: airbnb: 4 ($8,083)
+
+================================================================================================
+PORTFOLIO — completed months only
+Month       Nts  Avail   Occ%     Revenue   RevPAR
+Dec 2025     3      3   100%         939      313
+Jan 2026    28     54    52%       7,651      142
+Feb 2026    28     71    39%       9,568      135
+Mar 2026    46     62    74%      11,189      180
+Apr 2026    43     60    72%      10,819      180
+May 2026    41     62    66%      13,482      217
+Jun 2026    50     60    83%      19,129      319
+Jul 2026    53     62    85%      19,501      315
+Aug 2026    48     62    77%      18,113      292
+Sep 2026    41     60    68%      12,706      212
+------------------------------------------------------------------------------------------------
+TOTAL       381    556    69%     123,098      221
+
+NOTE: 'Revenue' is PriceLabs rental_revenue. Whether that figure is GROSS or NET of
+the OTA fee is UNVERIFIED (see registry/contract-terms.yaml). On Airbnb that is a
+15.5% swing. These figures are directionally sound for occupancy and pacing;
+do NOT use them for an owner payout until that is settled.
