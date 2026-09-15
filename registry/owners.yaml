@@ -1,0 +1,50 @@
+# NEHC Owner Registry
+# Will, 2026-09-15: "I will let you know those owners names." Held as UNKNOWN until then.
+# HARD RULE: no owner-facing document is produced or sent for an owner whose name is UNKNOWN.
+version: 1
+updated: 2026-09-15
+
+owners:
+  - id: OWNER-FLAGSTONE
+    property_ref: NEHC-P-FLAGSTONE
+    legal_name: UNKNOWN            # pending Will
+    email: UNKNOWN
+    phone: UNKNOWN
+    executed_agreement: UNKNOWN
+    insurance_cert_on_file: UNKNOWN   # contract requires $1M liability, Kembo Homes additional insured
+    status: ACTIVE_MANAGEMENT
+
+  - id: OWNER-AMORY
+    property_ref: NEHC-P-AMORY
+    legal_name: UNKNOWN
+    email: UNKNOWN
+    phone: UNKNOWN
+    executed_agreement: UNKNOWN
+    insurance_cert_on_file: UNKNOWN
+    status: ACTIVE_MANAGEMENT
+
+  - id: OWNER-LUDLOW
+    property_ref: NEHC-P-LUDLOW
+    legal_name: UNKNOWN
+    email: UNKNOWN
+    phone: UNKNOWN
+    executed_agreement: UNKNOWN
+    insurance_cert_on_file: UNKNOWN
+    status: ACTIVE_MANAGEMENT
+    note: "Beata Balazsi (beatab1977@hotmail.com) is the only non-NEHC member of the Ludlow
+           Slack channel. Role UNVERIFIED — do not assume she is the owner."
+
+  - id: OWNER-CURRIER
+    property_ref: NEHC-P-LAKESHORE
+    legal_name: UNKNOWN            # surname "Currier" from Drive folder name only
+    surname_hint: Currier
+    email: UNKNOWN
+    phone: UNKNOWN
+    executed_agreement: DRAFT_ONLY
+    prior_manager: Vacasa
+    status: ONBOARDING
+
+# Owner acquisition pipeline lives in NEHC Owner CRM
+# (1DJKTpTKk37BAgR6NBMjLqlWxkISzMyb74OTEMP56bJ4, owned by kyle@).
+# 4 rows carry status; ~176 rows are an unworked bulk list (PROSPECT — not pipeline).
+# Referral partner: Omni Cleaning (source of 3 of the 4 live leads).

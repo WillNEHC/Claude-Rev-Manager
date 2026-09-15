@@ -1,0 +1,77 @@
+# NEHC Vendor Registry
+# Built from verified Slack activity and the maintenance tracker. Commercial terms were not
+# found in any system — rates, insurance, W-9s and scope are UNKNOWN across the board.
+version: 1
+updated: 2026-09-15
+
+routing_rules:
+  cleaning_related: MELISSA           # Sage Grove Housekeeping
+  inventory_orders: DORCAS
+  everything_else: KYLE
+  vendor_coordination: KYLE
+  ambiguous: "mark 'confirm assignee' — do not guess"
+
+vendors:
+  - id: SAGE-GROVE
+    name: "Sage Grove Housekeeping"
+    contact: "Melissa Ferranti"
+    email: info@sagegrovehousekeeping.com
+    role: "Housekeeping partner — staffing, scheduling, QC, linen/inventory counts"
+    covers: [NEHC-P-FLAGSTONE, NEHC-P-AMORY]
+    rates: UNKNOWN
+    insurance_on_file: UNKNOWN
+    w9_on_file: UNKNOWN
+    external: true
+
+  - id: FERNANDA
+    name: "Fernanda Cruz"
+    email: nanda.pandah97@gmail.com
+    role: "Cleaner on the ground; schedules via her own Jobber account"
+    covers: [NEHC-P-FLAGSTONE, NEHC-P-AMORY]
+    joined_slack: 2026-08-31
+    rates: UNKNOWN
+    external: true
+
+  - id: HANNAH
+    name: "Hannah"
+    role: "Cleaner, works under Sage Grove"
+    covers: [NEHC-P-FLAGSTONE]
+    contact: UNKNOWN
+    external: true
+
+  - id: CHRIS-ONEIL
+    name: "Chris O'Neil"
+    role: "Handyman / plumbing"
+    tickets: [NEHC-0002, NEHC-0004, NEHC-0006]
+    contact: UNKNOWN
+    rates: UNKNOWN
+    external: true
+
+  - id: MATT-HANDYMAN
+    name: "Matt"
+    role: "Handyman"
+    tickets: [NEHC-0001]
+    contact: UNKNOWN
+    external: true
+
+  - id: WINSTON
+    name: "Winston"
+    role: "Contractor — 672 Amory shower remodel"
+    status: DISPUTED
+    note: "Left paint/materials on site, work unfinished (NEHC-0009, High, flagged >$500).
+           Will was contacting 8/11. Resolution UNKNOWN — REQUIRES HUMAN INPUT."
+    external: true
+
+coverage_gaps:
+  - property: NEHC-P-LUDLOW
+    gap: "No housekeeping vendor, no handyman, no local contact identified.
+          Property is live and has Dec 26 - Jan 1 booked."
+    severity: HIGH
+
+service_providers_not_connected:
+  - { name: Turno,  role: "Turnover scheduling", status: "not connected / existence UNKNOWN" }
+  - { name: Waivo,  role: "Damage claims", status: "in use by Dorcas, not connected" }
+  - { name: Jobber, role: "Cleaner's own scheduling", status: "vendor-owned, not NEHC's" }
+  - { name: "Happy Guest", role: "Guest experience", status: "onboarding began 2026-09-04" }
+  - { name: eseospace, role: "Website / direct booking", status: "active engagement" }
+  - { name: "Omni Cleaning", role: "REFERRAL PARTNER, not a service vendor", status: "active" }

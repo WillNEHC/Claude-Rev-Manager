@@ -1,0 +1,112 @@
+# NEHC Contract Terms Registry
+#
+# WHY THIS FILE EXISTS: the fee percentage used to live inside a prompt. That is how the
+# owner-report tool ended up on 20% while the agreement template says 25%. Fee terms are
+# DATA, not prose. Tools read them from here. Nothing computes money from a prompt.
+#
+# Will confirmed 2026-09-15: "our contract is customizable for some owners."
+# So the template is the DEFAULT, and each property may legitimately override it.
+# An override is only valid once it is traced to an EXECUTED agreement.
+#
+# HARD RULE: if a property's terms are `source: UNVERIFIED`, tools MUST NOT generate an
+# owner statement for it. Stop and ask Will. Never fall back to the default silently.
+
+version: 1
+updated: 2026-09-15
+
+# ---------------------------------------------------------------------------
+# DEFAULT — verbatim from "NEHC - STR Management Agreement"
+# (1R1bFFDmw4CSRswBMPs5oiA9W1QOmcTT2P6Ry9-qxylw). NOTE: that Drive copy is an
+# UNEXECUTED TEMPLATE (blank signature blocks, [address], [list all legal owners]).
+# ---------------------------------------------------------------------------
+default_terms:
+  source: "Management Agreement template, Drive 1R1bFFDmw4CSRswBMPs5oiA9W1QOmcTT2P6Ry9-qxylw"
+  source_status: TEMPLATE_UNEXECUTED
+
+  management_fee_pct: 25.0                       # Part I §C.1
+  minimum_monthly_fee: null                      # NOT present in the template
+  technology_fee_monthly: 30.00                  # Part I §A.10
+
+  rental_proceeds:
+    basis: rent_only                             # Part II §C.3 — excludes taxes, cleaning, guest fees
+    channel_bookings_deduct_ota_fees: true       # Part II §C.2 — "less fees, charges, or commissions
+                                                 # imposed by the Channel"; §C.4 lists them as deducted
+                                                 # BEFORE Rental Proceeds are calculated
+    ota_host_fee_reference:                      # §C.4, "approximate", set by the OTA, not by NEHC
+      airbnb_pct: 3
+      vrbo_pct: 5
+      bookingcom_pct: 15
+
+  guest_fees_retained_by_nehc: true              # Part II §B.1 — booking fee, PET FEE, hot tub fee,
+                                                 # late check-out fee, concierge etc. are NOT Rental
+                                                 # Proceeds and are NOT shared with Owner
+  pet_fee_to_owner: false
+  early_late_fee_owner_share_pct: 0
+
+  statement_basis: checkout_month                # Part I §C.2
+  payment_due_day: 10                            # by the 10th, next business day if weekend/holiday
+
+  repair_cap_without_owner_auth: 800.00          # Part I §A.7
+  emergency_repair_notify_threshold: 1500.00     # Part II §B.6 — notify within 24h
+  operational_flag_threshold: 500.00             # NOT contractual. Internal early-warning only.
+  refund_flag_threshold: 200.00                  # NOT contractual. Internal early-warning only.
+
+  deep_cleans_per_year_min: 2                    # Part II §B.7, charged to Owner at market rate
+  post_termination_commission_pct: 10            # Part I §E.3
+  termination_notice_days: 90                    # Part I §E.2
+  owner_liability_insurance_min: 1000000         # Part I §B.5, Kembo Homes named additional insured
+
+# ---------------------------------------------------------------------------
+# PER-PROPERTY TERMS
+# Populate ONLY from an executed agreement. Until then: UNVERIFIED → statements blocked.
+# ---------------------------------------------------------------------------
+properties:
+
+  NEHC-P-FLAGSTONE:
+    source: UNVERIFIED
+    executed_agreement_file: UNKNOWN
+    overrides: {}
+    blocked_reason: >
+      UNKNOWN — REQUIRES HUMAN INPUT. No executed agreement located. Will confirmed terms are
+      customizable per owner, so the 25% default cannot be assumed for this property.
+      Needed: management_fee_pct, whether OTA fees are deducted, pet/early/late fee treatment,
+      any minimum monthly fee, and any Exhibit A.
+
+  NEHC-P-AMORY:
+    source: UNVERIFIED
+    executed_agreement_file: UNKNOWN
+    overrides: {}
+    blocked_reason: "UNKNOWN — REQUIRES HUMAN INPUT. Same as Flagstone."
+
+  NEHC-P-LUDLOW:
+    source: UNVERIFIED
+    executed_agreement_file: UNKNOWN
+    overrides: {}
+    blocked_reason: "UNKNOWN — REQUIRES HUMAN INPUT. Same as Flagstone."
+
+  NEHC-P-LAKESHORE:
+    source: DRAFT_NOT_EXECUTED
+    executed_agreement_file: null
+    draft_file: 1OM3DseG5orkEowzu3sI_UoTBoE7hX4G00O3a1OsHFeA
+    overrides: {}
+    blocked_reason: >
+      Agreement is titled "Proposed Revisions — DRAFT" (2026-08-28) and is not executed.
+      Property is ONBOARDING. No statement may be generated.
+
+# ---------------------------------------------------------------------------
+# What the old skill asserted, kept ONLY as an audit trail of what to verify.
+# Do not treat any line here as authoritative.
+# ---------------------------------------------------------------------------
+prior_skill_assertions_to_verify:
+  note: >
+    These were hardcoded in nehc-owner-report and applied to ALL properties. Given that terms
+    are customizable per owner, some may be correct for SOME properties — but they were being
+    applied universally, which is the actual defect.
+  claims:
+    management_fee_pct: 20.0            # vs template 25%
+    minimum_monthly_fee: 250.00         # not in the template at all
+    deduct_ota_fees: false              # vs template "deduct" — cited "Exhibit A", not located
+    pet_fee_to_owner: 200.00            # vs template "retained by NEHC"
+    early_late_fee_owner_share_pct: 50  # vs template "retained by NEHC"
+    provenance: "Skill said 'Confirmed by owner Aug 2026'. No such confirmation found in
+                 Drive, Gmail or Slack. Which owner, and which property, is UNKNOWN."

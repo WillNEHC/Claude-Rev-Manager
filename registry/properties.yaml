@@ -1,0 +1,144 @@
+# NEHC Property Registry — the stable key that joins every system.
+# Fixes data-map issue I-2: one property had 6 different names and nothing joined them.
+# RULE: every tool resolves a property through `id` here. Never by name matching.
+# Source of every field is recorded. Anything unverified is UNKNOWN — never guessed.
+
+version: 1
+updated: 2026-09-15
+updated_by: Phase 0 discovery + Will's decisions 2026-09-15
+
+properties:
+
+  - id: NEHC-P-FLAGSTONE
+    status: ACTIVE_MANAGEMENT
+    display_name: "183 Flagstone Drive"
+    address: "183 Flagstone Drive, Nashua, NH 03063"
+    city: Nashua
+    state: NH
+    bedrooms: 3
+    owner_ref: OWNER-FLAGSTONE          # see owners.yaml — name pending Will
+    keys:
+      slack_channel_id: C072LGT0RGA
+      slack_channel_name: "#183-flagstone-nashua"
+      slack_channel_visibility: public   # contains EXTERNAL vendors — never auto-post
+      pricelabs_listing_id: "1145414"
+      pricelabs_pms_name: smartbnb
+      pricelabs_listing_name: "183 Flagstone Nashua"
+      drive_folder_id: 1Pgp6h4voWzZe8Zp80zu0PtROucDclWeB
+      info_sheet_id: 1ZpC3nfWYR6dCDQHgITfhnWD0lklex3aU9N2bTxDWPDI  # owned by michaudkyle@gmail.com
+    aliases: ["183 Flagstone", "Flagstone", "Nashua - Townhome", "183 Flagstone Nashua",
+              "183 Flagstone Drive, Nashua NH"]
+    channels: [airbnb, vrbo, direct, gvr, manual]
+    verified_by: "Slack channel + Drive folder + PriceLabs listing + 16 reservations Aug-Oct 2026"
+
+  - id: NEHC-P-AMORY
+    status: ACTIVE_MANAGEMENT
+    display_name: "672 Amory Street"
+    address: "672 Amory Street, Manchester, NH"
+    city: Manchester
+    state: NH
+    bedrooms: 4
+    owner_ref: OWNER-AMORY
+    keys:
+      slack_channel_id: C0726T0S05C
+      slack_channel_name: "#672-amory-street-manchester"
+      slack_channel_visibility: public   # contains EXTERNAL vendors — never auto-post
+      pricelabs_listing_id: "912900"
+      pricelabs_pms_name: smartbnb
+      pricelabs_listing_name: "*NEW* Beautiful 3 floor Townhome with Sauna"
+      drive_folder_id: 1phLmu99wE5eBNbwluQMiTQAFifVpreeA
+      info_sheet_id: 1a7XwPCnPucB0vru6a7cHdvYJbmkdXKxsBbCCHhnHCns  # owned by michaudkyle@gmail.com
+    aliases: ["672 Amory", "672 Amory Street", "672 Armory", "Manchester - Sauna",
+              "Townhome with Sauna", "Manchester Sauna Townhome"]
+    channels: [airbnb, vrbo, bookingcom, direct, gvr, manual]
+    notes: "Renovation 2026-09-22→10-01 (stair treads, 2nd-floor vinyl). Cleans moved: 9/22→9/25, 9/27→10/2."
+    verified_by: "Slack channel + Drive folder + PriceLabs listing + 12 reservations Aug-Oct 2026"
+
+  - id: NEHC-P-LUDLOW
+    status: ACTIVE_MANAGEMENT
+    seasonality: ski            # low summer occupancy is expected, NOT dormancy
+    display_name: "61 Pleasant St, Ludlow VT"
+    address: "61 Pleasant St, Ludlow, VT"
+    city: Ludlow
+    state: VT
+    bedrooms: 3
+    owner_ref: OWNER-LUDLOW
+    keys:
+      slack_channel_id: C0ABF6RT6JH
+      slack_channel_name: "#61-pleasant-ludlow-vt"
+      slack_channel_visibility: private
+      pricelabs_listing_id: "8e787b69-4ece-4241-a47c-f2b8ae540290"
+      pricelabs_pms_name: smartbnb
+      pricelabs_listing_name: "Modern 3BR/2BA | 3 Min to Okemo Mountain"
+      drive_folder_id: 18Vu1tULUnCauN2nCqJCjHYbiT__hWyk3
+      info_sheet_id: UNKNOWN            # no info sheet found for this property
+    aliases: ["61 Pleasant", "61 Pleasant St_Ludlow", "Okemo", "Ludlow",
+              "Modern 3BR/2BA | 3 Min to Okemo Mountain"]
+    channels: [airbnb, direct, gvr, manual]
+    open_questions:
+      unit_count: "UNKNOWN — REQUIRES HUMAN INPUT. Kyle said '2 new units under this address'
+                   (Slack 2026-01-28); PriceLabs shows 1 listing; Happy Guest form says 5 active units."
+      housekeeping: "UNKNOWN — REQUIRES HUMAN INPUT. No cleaner identified. Sage Grove covers
+                     Flagstone + Amory only."
+      beata_balazsi_role: "UNKNOWN — REQUIRES HUMAN INPUT. Only non-NEHC member of this channel
+                           (joined 2026-02-13). Owner, cleaner or local contact?"
+    verified_by: "Slack channel + Drive folder + PriceLabs listing + 3 reservations in 2026
+                  (Feb 14-17, Feb 20-22, Dec 26-Jan 1 booked 2026-09-09 @ $2,778 rent)"
+
+  - id: NEHC-P-LAKESHORE
+    status: ONBOARDING
+    display_name: "230 Lake Shore Drive (Strolling Woods)"
+    address: "230 Lake Shore Drive, Franklin, NH 03235"
+    city: Franklin
+    state: NH
+    bedrooms: 8
+    owner_ref: OWNER-CURRIER
+    keys:
+      slack_channel_id: NONE            # not yet created — create at go-live
+      pricelabs_listing_id: NONE        # not yet priced or distributed
+      drive_folder_id: 1xEu7x-NznvBuJeFNJi8xQZICBoA3SMap   # "Currier - 230LakeShoreDr"
+    aliases: ["Strolling Woods", "230 Lakeshore", "230 LakeShore Drive Franklin",
+              "LakeShoreDrive-Franklin", "Franklin - Lake Shore Drive", "Currier",
+              "Webster Lake Estate"]
+    prior_manager: Vacasa
+    onboarding:
+      agreement_status: "DRAFT — '230_Lakeshore_Dr NEHC Owner Agreement Proposed Revisions DRAFT'
+                         (1OM3DseG5orkEowzu3sI_UoTBoE7hX4G00O3a1OsHFeA, 2026-08-28). NOT executed."
+      photos: "Shoot 2026-09-10; 1.8GB archive uploaded by Kyle 2026-09-14"
+      video: "3 Descript projects created 2026-09-14"
+      listing_copy: "Drafted by Will 2026-09-14/15 (reported by Will; drafted outside audited systems)"
+      marketing_hold: "HOLD. Drafted announcement asserts 'just took over management'. Do not publish
+                       until the agreement is executed and the listing is live."
+    blocks_until_live: [executed_agreement, pricelabs_listing, slack_channel, housekeeping_vendor]
+    verified_by: "Drive folder + draft agreement + photo/video assets. No listing, no channel, no bookings."
+
+  - id: NEHC-P-ATHERTON
+    status: PROSPECT
+    display_name: "Atherton Ave, Nashua"
+    keys:
+      drive_folder_id: 1mio5TZf71Ah74luotqkbk61SVJ1sFG31
+    notes: "Full template folder exists. No channel, no listing, no bookings, no contract.
+            UNKNOWN — REQUIRES HUMAN INPUT: is this live pipeline or abandoned?"
+
+# ---------------------------------------------------------------------------
+# HISTORICAL — confirmed by Will 2026-09-15: "other properties are old ones."
+# These are NOT managed by NEHC. They remain visible in the PriceLabs account
+# (michaudkyle@gmail.com) but have ZERO reservations in all of 2026.
+# HARD RULE: never generate an owner statement, report, price change, or guest
+# communication for any listing below. Exclude from every roster and batch job.
+# ---------------------------------------------------------------------------
+historical:
+  confirmed_by: "Will, 2026-09-15"
+  reservations_2026: 0
+  listings:
+    - { pricelabs_listing_id: "947332",  name: "114 Dover Road" }
+    - { pricelabs_listing_id: "947334",  name: "59 Tracy Lane" }
+    - { pricelabs_listing_id: "1309266", name: "Charming home with hot tub" }
+    - { pricelabs_listing_id: "1025588", name: "The Blue Lodge" }
+    - { pricelabs_listing_id: "85444",   name: "The Blue Lodge-NH Lake Retreat", pms: houfy }
+    - { pricelabs_listing_id: "950086",  name: "Cape Oasis-Pool, walk to beach" }
+    - { pricelabs_listing_id: "950864",  name: "Akapesket" }
+    - { pricelabs_listing_id: "979114",  name: "Mashpee House w/Pool, Fire Pit & Game Room!" }
+    - { pricelabs_listing_id: "988406",  name: "Charming Cape House-Pool, Game Room, walk to beach" }
+    - { pricelabs_listing_id: "988408",  name: "Beautiful Home w/ Pool, Fire pit and Game Room!" }
+    - { pricelabs_listing_id: "988410",  name: "Cape Cod Escape w/ Pool! Close to Beaches & Town!" }
