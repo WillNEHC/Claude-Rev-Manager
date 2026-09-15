@@ -105,15 +105,29 @@ properties:
               "Webster Lake Estate"]
     prior_manager: Vacasa
     onboarding:
-      agreement_status: "DRAFT — '230_Lakeshore_Dr NEHC Owner Agreement Proposed Revisions DRAFT'
-                         (1OM3DseG5orkEowzu3sI_UoTBoE7hX4G00O3a1OsHFeA, 2026-08-28). NOT executed."
+      agreement_status: "✅ EXECUTED 2026-08-26 — 230LakeshoreDr-CurrierFinal.pdf
+                         (1YK4cfXqS90Cqk_9PzeDUXP4-CR56LiN9). Google eSignature, both parties.
+                         Owner: Rand Currier. Terms in registry/contract-terms.yaml.
+                         CORRECTION: an earlier Phase 0 pass called this draft-only. It is signed.
+                         The Drive Doc titled '...Proposed Revisions DRAFT' is a superseded round."
+      diligence_on_file: "230Lakeshore TAX CARD.pdf, AxisGIS property map, NH LLC Verification"
+      photography: "Northlight Global Property Media (Keegan R) — $700 stills + drone + 2D/3D
+                    floor plans. Invoiced 2026-09-12, PAID same day. Media delivered and sent
+                    to the owner 2026-09-12."
       photos: "Shoot 2026-09-10; 1.8GB archive uploaded by Kyle 2026-09-14"
       video: "3 Descript projects created 2026-09-14"
-      listing_copy: "Drafted by Will 2026-09-14/15 (reported by Will; drafted outside audited systems)"
+      listing_copy: "Drafted by Will 2026-09-14/15 (reported by Will; drafted outside audited
+                     systems). Will to Hospitable support 2026-09-14: \"strolling woods isnt
+                     live right?\" — consistent with not yet published."
       marketing_hold: "HOLD. Drafted announcement asserts 'just took over management'. Do not publish
                        until the agreement is executed and the listing is live."
-    blocks_until_live: [executed_agreement, pricelabs_listing, slack_channel, housekeeping_vendor]
-    verified_by: "Drive folder + draft agreement + photo/video assets. No listing, no channel, no bookings."
+    blocks_until_live: [pricelabs_listing, slack_channel, housekeeping_vendor, smart_lock_install]
+    verified_by: "EXECUTED agreement + Drive folder + paid photography + video assets.
+                  Still no PriceLabs listing, no Slack channel, no bookings."
+    status_note: >
+      Contractually a client since 2026-08-26; operationally still pre-launch. Treat as a real
+      obligation — the agreement's monthly statement duty (§A.8) is already running — while
+      keeping it out of any arrivals/turnover report until it has a listing.
 
   - id: NEHC-P-ATHERTON
     status: PROSPECT

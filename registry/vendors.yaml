@@ -83,6 +83,55 @@ coverage_gaps:
     severity: MEDIUM
     was: HIGH
 
+  - id: NORTHLIGHT
+    name: "Northlight Global Property Media"
+    contact: "Keegan R"
+    email: "listings@fotello.co / keeganr@badgerpeabodysmith.com"
+    role: "Property photography — stills, drone, 2D + 3D floor plans"
+    used_for: [NEHC-P-LAKESHORE]
+    rate: "$700 flat (stills + drone + 2D/3D floor plans)"
+    status: "PAID 2026-09-12, invoice XCLZJUXY-0001"
+    note: "Grants full photo rights to the owner, which the agreement §G.9 requires. Based in Concord NH."
+    external: true
+
+  - id: EVERGREEN-PEAK
+    name: "Evergreen Peak Media"
+    email: clients@evergreenpeakmedia.com
+    role: "Property photography — quoted two tiers for 230 Lakeshore, NOT selected"
+    status: PROSPECTIVE
+    external: true
+
+  - id: FCM-JAVIER
+    name: "Javier — First Class Mechanical (FCM)"
+    email: firstclassmechanical0@gmail.com
+    role: UNKNOWN
+    status: DISPUTED_SETTLED
+    risk: HIGH
+    note: >
+      A "FCM-Payment Agreement" was sent for eSignature 2026-08-08 with the message
+      "please sign this ASAP. Deadline to sign before taking legal action is Tuesday
+      August 11, 2026." Javier signed 2026-08-11. Will signed as wrealestatenh@gmail.com —
+      his SEPARATE real-estate identity, NOT his NEHC address — so this may be a personal or
+      real-estate matter rather than an NEHC vendor dispute.
+      Calendar 2026-09-01: "Meet Javier for the deposit".
+      UNKNOWN — REQUIRES HUMAN INPUT: is this an NEHC liability or Will's separate business?
+    external: true
+
+  - id: HOSTGPO
+    name: "HostGPO"
+    contact: "Jen S — jen.s@hostgpo.com"
+    role: "Group purchasing organisation — supply sourcing"
+    status: "Membership applied 2026-08-10, account manager assigned"
+    note: "Relevant to the recurring inventory/supply tickets (NEHC-0010, 0011, 0015)."
+    external: true
+
+  - id: ARCHAMBAULT-LAW
+    name: "Aaron Archambault"
+    email: aaron@aaarchambaultlaw.com
+    role: "Attorney — reviewing the Kembo Homes LLC amended operating agreement"
+    engaged_by: Kyle
+    external: true
+
 service_providers_not_connected:
   - { name: Turno,  role: "Turnover scheduling", status: "not connected / existence UNKNOWN" }
   - { name: Waivo,  role: "Damage claims", status: "in use by Dorcas, not connected" }

@@ -19,7 +19,7 @@ owners:
     legal_name: UNKNOWN
     email: UNKNOWN
     phone: UNKNOWN
-    executed_agreement: UNKNOWN
+    executed_agreement: NONE_FOUND
     insurance_cert_on_file: UNKNOWN
     status: ACTIVE_MANAGEMENT
 
@@ -28,7 +28,7 @@ owners:
     legal_name: UNKNOWN
     email: UNKNOWN
     phone: UNKNOWN
-    executed_agreement: UNKNOWN
+    executed_agreement: NONE_FOUND
     insurance_cert_on_file: UNKNOWN
     status: ACTIVE_MANAGEMENT
     note: "Beata Balazsi (beatab1977@hotmail.com) is the only non-NEHC member of the Ludlow
@@ -36,13 +36,32 @@ owners:
 
   - id: OWNER-CURRIER
     property_ref: NEHC-P-LAKESHORE
-    legal_name: UNKNOWN            # surname "Currier" from Drive folder name only
-    surname_hint: Currier
-    email: UNKNOWN
-    phone: UNKNOWN
-    executed_agreement: DRAFT_ONLY
+    legal_name: "Rand Currier"                      # ✅ VERIFIED from the executed agreement
+    email: randcurrier@gmail.com
+    phone: "703-587-8960"
+    mailing_address: "160 Lakeshore Drive, Franklin, NH 03235"
+    executed_agreement: 1YK4cfXqS90Cqk_9PzeDUXP4-CR56LiN9
+    executed_date: 2026-08-26
     prior_manager: Vacasa
+    prior_relationship: "Will to Rand, 2026-08-26: \"I look forward to officially working with
+                         you again\" — indicates a prior working relationship. Context UNKNOWN."
     status: ONBOARDING
+    note: >
+      Owner's MAILING address is 160 Lakeshore Drive; the MANAGED property is 230 Lakeshore Drive.
+      A Drive file "NEHC_Owner_Agreement_160 Lakeshore" (1tCp0Jwphju0hBmM-MTP4vIkX_YjJYs5T,
+      2026-06-26) is almost certainly an early draft named after his mailing address rather than a
+      second property — but that is an inference, not verified. UNKNOWN — REQUIRES HUMAN INPUT.
+
+# ---------------------------------------------------------------------------
+# NO_EXECUTED_AGREEMENTS — finding of 2026-09-15
+# A complete search of Google eSignature history (12 threads, all time) and of Drive returned
+# exactly ONE executed NEHC owner agreement: 230 Lakeshore Drive / Rand Currier.
+# There is NO executed management agreement anywhere in Gmail or Drive for 183 Flagstone,
+# 672 Amory, or 61 Pleasant — the three properties that actually produce revenue today.
+# This does NOT prove none exists: it could be on paper, in Kyle's account, or predate the NEHC
+# brand under Kembo Homes. But it is not in any system reachable from here.
+# UNKNOWN — REQUIRES HUMAN INPUT. This blocks owner statements for all three.
+# ---------------------------------------------------------------------------
 
 # Owner acquisition pipeline lives in NEHC Owner CRM
 # (1DJKTpTKk37BAgR6NBMjLqlWxkISzMyb74OTEMP56bJ4, owned by kyle@).

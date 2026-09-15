@@ -85,13 +85,55 @@ properties:
     blocked_reason: "UNKNOWN — REQUIRES HUMAN INPUT. Same as Flagstone."
 
   NEHC-P-LAKESHORE:
-    source: DRAFT_NOT_EXECUTED
-    executed_agreement_file: null
-    draft_file: 1OM3DseG5orkEowzu3sI_UoTBoE7hX4G00O3a1OsHFeA
-    overrides: {}
-    blocked_reason: >
-      Agreement is titled "Proposed Revisions — DRAFT" (2026-08-28) and is not executed.
-      Property is ONBOARDING. No statement may be generated.
+    source: EXECUTED                  # ✅ VERIFIED 2026-09-15 from the signed PDF
+    executed_agreement_file: 1YK4cfXqS90Cqk_9PzeDUXP4-CR56LiN9   # 230LakeshoreDr-CurrierFinal.pdf
+    executed_date: 2026-08-26
+    signatories:
+      owner: "Rand Currier <randcurrier@gmail.com>, 160 Lakeshore Drive, Franklin NH 03235, 703-587-8960"
+      nehc: "Will Robichaud — Partner/Operator"
+    audit_trail: "Google eSignature. Sent 2026-08-26 15:27 UTC; owner signed 22:38:31 UTC;
+                  Will signed 22:41:17 UTC; COMPLETED 22:41:17 UTC."
+    overrides:
+      management_fee_pct: 20.0                      # §C.1 — NOT the 25% template rate
+      minimum_monthly_fee: 250.00                   # §A.12
+      repair_cap_without_owner_auth: 500.00         # §A.7 — NOT the $800 template cap.
+                                                    # Notify Owner by phone/text BEFORE authorising
+                                                    # any repair expected to exceed $500, except a
+                                                    # genuine life-safety emergency.
+      refund_notice_threshold: 200.00               # §B.3 — notify Owner BEFORE issuing any refund >$200
+      pet_fee_to_owner: true                        # Exhibit A — $200/stay passed to Owner IN FULL,
+                                                    # shown as its own line on the statement
+      early_late_fees_charged: false                # Exhibit A — "Early Check-In and Late Check-Out
+                                                    # fees will not apply to guests if accommodated"
+      post_termination_commission_pct: 0            # the 10% provision was removed in negotiation
+                                                    # (Will to Rand, 2026-06-30: "I removed the 10%
+                                                    # provision entirely")
+      owner_trust_account_initial: 250.00           # §A.10
+      owner_trust_account_minimum: 250.00           # §A.11 — auto-debit to replenish
+      owner_may_set_peak_rate_floor: true           # §A.3 — Owner may set a minimum nightly rate
+                                                    # floor for designated peak periods, in writing
+      photography_billed: at_cost                   # §A.14.a — NOT the $575 template figure
+      nehc_bears_own_error_refunds: true            # §B.3 / A.8.15 — refunds caused by NEHC error
+                                                    # do NOT reduce Owner Payment
+      assignment_requires_owner_consent: true       # §G.3
+      fee_increases_require_owner_consent: true     # §G.8.b — silence is NOT acceptance
+    ota_host_fee_schedule:                          # Exhibit A + §C.4 — differs from the template
+      airbnb_pct: 15.5
+      vrbo_pct: 8
+      bookingcom_pct: 15
+      direct_pct: 4
+    OPEN_AMBIGUITY_IN_EXECUTED_DOCUMENT: >
+      SOURCE CONFLICT — HUMAN REVIEW REQUIRED, and it is INSIDE the signed contract, not between
+      documents. Part II §C.2 says Rental Proceeds for Channel bookings are the nightly rate
+      "less fees, charges, or commissions imposed by the Channel", and §C.4 says the OTA host-side
+      fees are "deducted from booking revenue before Rental Proceeds are calculated".
+      Exhibit A instead presents those same percentages as a Booking Fee "Charged To: Guest",
+      a "pass-through of OTA commission... Retained by NEHC; no markup".
+      Both cannot operate at once without either double-counting the OTA cost or leaving it
+      uncharged. Reading A (Exhibit A governs): the guest pays it, rent reaches the Owner whole.
+      Reading B (§C.2/C.4 govern): it is deducted from rent before the Owner is paid.
+      On Airbnb at 15.5% this is the difference between an Owner receiving 100% and ~84.5% of rent.
+      DO NOT resolve this without Will and, given it is an executed contract, likely counsel.
 
 # ---------------------------------------------------------------------------
 # What the old skill asserted, kept ONLY as an audit trail of what to verify.
