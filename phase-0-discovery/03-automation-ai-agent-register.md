@@ -40,15 +40,26 @@
 | **AI necessary?** | **NO.** Every field is a query + date comparison + string template. **This should be a scheduled script with zero LLM calls.** Highest-confidence cost win in the company. |
 | **RISK** | 🟠 **MEDIUM — expectation risk.** The sample message tells the team a brief arrives every morning. It does not. Anyone relying on `#dashboard` to see today's arrivals is reading a 5-week-old sample. |
 
-### A-4 · Google Gemini meeting notes — **the only automation actually running**
+### A-4 · Google Gemini meeting notes — **the retained notetaker**
 | | |
 |---|---|
 | **Type** | Google Workspace native AI, auto-attached to Meet |
 | **Trigger** | **Automatic** on recurring "STR Mastermind -Weekly Meet" (Thursdays 09:30 ET) and ad-hoc Meets |
 | **Evidence** | 6 "…Notes by Gemini" Docs (2026-07-31 → 2026-09-11); `gemini-notes@google.com` mail; notes auto-attached to calendar events |
 | **Touches** | Meeting content incl. **an external peer group** (`livefreelodgingco@gmail.com`, `lisa@northluxhospitalityco.com`, `taylor@venturestays.net`, `biglakepropertiesnh@gmail.com`, `annecarr79@`, `dai.dacal@`, `linda.calabria@`) |
-| **Owner** | Google default — **nobody chose it deliberately** |
+| **Owner** | Google default originally — **confirmed as the deliberate choice by Will, 2026-09-15** ("I use gemini anyway") |
 | **RISK** | 🟠 **MEDIUM — confidentiality.** Notes of calls with **competing operators** are auto-generated and auto-distributed ("These notes have been sent to invited guests in your organization"). Nobody has reviewed what is captured. |
+
+### A-4b · Fireflies.ai — **DECOMMISSION (Will, 2026-09-15)**
+| | |
+|---|---|
+| **Type** | Third-party AI notetaker, OAuth-connected to Google Calendar |
+| **What it does** | Auto-joins meetings (Zoom **and** Google Meet), records, transcribes, emails a "Daily Brief" of decisions/action items, and sends pre-meeting prep that **researches attendees** |
+| **Evidence** | `fred@fireflies.ai` — "Your meeting recap — The Super Property Method" (Zoom, 2026-09-10); "Meeting Prep: Kris x Will STR Discussion" (2026-08-08); "Catch up on yesterday in 2 minutes" (2026-09-11) |
+| **Overlap** | **Fully duplicates Gemini**, which already auto-notes the same Google Meets |
+| **Decision** | 🔴 **Will, 2026-09-15: "remove fireflies as i use gemini anyway."** Gemini is the single notetaker going forward. |
+| **How it is removed** | It is **not** a calendar attendee (a calendar search for "fireflies" returns nothing), so it cannot be removed by editing events. It joins through an **OAuth grant**. Removal requires, in this order: (1) revoke Fireflies at **myaccount.google.com/permissions**, (2) disable auto-join / delete the account in Fireflies' own settings, (3) check Zoom's installed-apps list, since it recorded a Zoom webinar. **None of these are reachable from this environment** — `NOT ACCESSIBLE IN CURRENT ENVIRONMENT`. |
+| **Why it matters beyond cost** | It was recording the weekly mastermind with **seven operators from other companies**, and profiling external attendees. Revoking the grant also stops the transcript store from growing. |
 
 ### A-5 · GDIP — Guest Demand Intelligence Platform (unbuilt)
 | | |

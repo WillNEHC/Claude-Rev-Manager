@@ -122,33 +122,62 @@ properties:
       vrbo_pct: 8
       bookingcom_pct: 15
       direct_pct: 4
-    OPEN_AMBIGUITY_IN_EXECUTED_DOCUMENT: >
-      SOURCE CONFLICT — HUMAN REVIEW REQUIRED, and it is INSIDE the signed contract, not between
-      documents. Part II §C.2 says Rental Proceeds for Channel bookings are the nightly rate
-      "less fees, charges, or commissions imposed by the Channel", and §C.4 says the OTA host-side
-      fees are "deducted from booking revenue before Rental Proceeds are calculated".
-      Exhibit A instead presents those same percentages as a Booking Fee "Charged To: Guest",
-      a "pass-through of OTA commission... Retained by NEHC; no markup".
-      Both cannot operate at once without either double-counting the OTA cost or leaving it
-      uncharged. Reading A (Exhibit A governs): the guest pays it, rent reaches the Owner whole.
-      Reading B (§C.2/C.4 govern): it is deducted from rent before the Owner is paid.
-      On Airbnb at 15.5% this is the difference between an Owner receiving 100% and ~84.5% of rent.
-      DO NOT resolve this without Will and, given it is an executed contract, likely counsel.
+    OTA_FEE_TREATMENT:
+      decided_by: "Will, 2026-09-15"
+      decision: >
+        RESOLVED. The guest bears the OTA cost because NEHC raises the listed price on each
+        platform to absorb it. Exhibit A governs: the booking fee is charged to the guest as a
+        pass-through of actual platform cost, retained by NEHC with no markup. The owner receives
+        the intended base rent whole. Part II C.2/C.4 describe the same economics from the
+        platform's side (the OTA takes its cut off the gross before NEHC nets out) — they are not
+        a second, additional deduction from the owner.
+      markup_by_channel:                 # the uplift applied to the listed price to cover the fee
+        airbnb_pct: 15.5
+        vrbo_pct: 8
+        bookingcom_pct: 15
+        direct_pct: 4
+      OPEN_DATA_QUESTION_BEFORE_FIRST_STATEMENT: >
+        🔴 MUST BE SETTLED BEFORE ANY STATEMENT IS GENERATED. Will's mechanism is clear, but it
+        makes the statement arithmetic depend entirely on ONE unverified fact: whether PriceLabs
+        `rental_revenue` is the GROSS marked-up rate (fee included) or the NET amount NEHC actually
+        receives (fee already removed).
+          - If `rental_revenue` is GROSS, paying the owner that figure OVERPAYS by the markup
+            (15.5% on Airbnb), because the markup is the platform's fee, not the owner's rent.
+          - If `rental_revenue` is NET, deducting anything further UNDERPAYS by the same amount.
+        The error is the same size in either direction and it is large.
+        HOW TO SETTLE IT CHEAPLY: take one completed Airbnb reservation, compare the actual
+        Hospitable/Airbnb host payout against the PriceLabs `rental_revenue` for that same
+        reservation ID. If they match, the figure is NET. If PriceLabs is ~15.5% higher, it is GROSS.
+        One reservation answers it permanently.
+        Note: PriceLabs documents `ota_commission` and `rental_revenue_minus_ota_commission` as
+        separate fields but returned neither in our queries — they appear unpopulated for this
+        account, which is itself a signal worth checking.
+      note: >
+        This decision records the ECONOMIC intent for 230 Lakeshore. It does not license applying
+        the same treatment to Flagstone, Amory or Ludlow, whose agreements remain unlocated.
 
 # ---------------------------------------------------------------------------
-# What the old skill asserted, kept ONLY as an audit trail of what to verify.
-# Do not treat any line here as authoritative.
+# RESOLVED 2026-09-15 — what the old skill asserted, checked against the signed contract.
+# Kept as an audit trail of how the defect arose. Superseded by the verified terms above.
 # ---------------------------------------------------------------------------
-prior_skill_assertions_to_verify:
-  note: >
-    These were hardcoded in nehc-owner-report and applied to ALL properties. Given that terms
-    are customizable per owner, some may be correct for SOME properties — but they were being
-    applied universally, which is the actual defect.
-  claims:
-    management_fee_pct: 20.0            # vs template 25%
-    minimum_monthly_fee: 250.00         # not in the template at all
-    deduct_ota_fees: false              # vs template "deduct" — cited "Exhibit A", not located
-    pet_fee_to_owner: 200.00            # vs template "retained by NEHC"
-    early_late_fee_owner_share_pct: 50  # vs template "retained by NEHC"
-    provenance: "Skill said 'Confirmed by owner Aug 2026'. No such confirmation found in
-                 Drive, Gmail or Slack. Which owner, and which property, is UNKNOWN."
+prior_skill_assertions_checked:
+  finding: >
+    The skill's terms were NOT invented and NOT in conflict with the contract. They were taken
+    from the EXECUTED Rand Currier agreement for 230 Lakeshore — and then applied to every
+    property. The defect is over-generalisation from one owner's negotiated deal, not fabrication.
+  verdicts:
+    management_fee_pct:            { skill: 20.0,  currier_executed: 20.0,   verdict: CORRECT_FOR_CURRIER }
+    minimum_monthly_fee:           { skill: 250.0, currier_executed: 250.0,  verdict: CORRECT_FOR_CURRIER }
+    repair_cap:                    { skill: 500.0, currier_executed: 500.0,  verdict: CORRECT_FOR_CURRIER }
+    refund_notice_threshold:       { skill: 200.0, currier_executed: 200.0,  verdict: CORRECT_FOR_CURRIER }
+    pet_fee_to_owner:              { skill: 200.0, currier_executed: "in full", verdict: CORRECT_FOR_CURRIER }
+    deduct_ota_fees:               { skill: false, currier_executed: false,  verdict: CORRECT_FOR_CURRIER,
+                                     note: "Confirmed by Will 2026-09-15 — guest bears it via platform markup." }
+    early_late_fee_owner_share_pct: { skill: 50,   currier_executed: 0,
+                                      verdict: WRONG,
+                                      note: "Exhibit A: early check-in / late check-out fees are
+                                             not charged to guests at all when accommodated.
+                                             The skill invented a 50/50 split of a fee that
+                                             does not exist. This is the one genuine error." }
+  exhibit_a: "REAL. Part of the executed contract. The skill's citation was accurate."
+  owner_confirmation: "REAL. Rand Currier's eSignature, 2026-08-26 22:38:31 UTC."

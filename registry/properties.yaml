@@ -78,13 +78,14 @@ properties:
     unit_count: 2                     # CONFIRMED by Will 2026-09-15
     housekeeping_ref: BEATA           # CONFIRMED by Will 2026-09-15 — Beata Balazsi is the cleaner
     open_questions:
-      unit_2_not_in_pricelabs: >
-        FLAGGED 2026-09-15. Will confirmed 61 Pleasant is TWO units, but PriceLabs holds only ONE
-        Ludlow listing (8e787b69-4ece-4241-a47c-f2b8ae540290, "Modern 3BR/2BA | 3 Min to Okemo
-        Mountain"). The second unit is therefore not under dynamic pricing and may not be
-        distributed at all. Kyle asked Dorcas to "configure pricelabs" for 2 units on 2026-01-28.
-        REQUIRES HUMAN INPUT: is unit 2 listed anywhere, and should it be added to PriceLabs
-        before ski season? Okemo peak demand starts late December.
+      unit_2_status: >
+        RESOLVED 2026-09-15 by Will: the second unit is UNDER RENOVATION. Its absence from
+        PriceLabs is deliberate, not a distribution gap. No revenue is being lost to an
+        unlisted unit.
+        WATCH: Okemo peak demand starts late December and unit 1 already holds 26 Dec - 1 Jan.
+        If renovation completes in time, unit 2 should be listed and priced well before then —
+        ski inventory is booked months ahead, so a late listing captures little of the season.
+        UNKNOWN — REQUIRES HUMAN INPUT: target completion date.
     verified_by: "Slack channel + Drive folder + PriceLabs listing + 3 reservations in 2026
                   (Feb 14-17, Feb 20-22, Dec 26-Jan 1 booked 2026-09-09 @ $2,778 rent)"
 
