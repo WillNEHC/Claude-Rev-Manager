@@ -5,7 +5,8 @@ version: 1
 updated: 2026-09-15
 
 routing_rules:
-  cleaning_related: MELISSA           # Sage Grove Housekeeping
+  cleaning_related: MELISSA           # Sage Grove Housekeeping (NH: Flagstone, Amory)
+  cleaning_related_ludlow: BEATA      # 61 Pleasant St, Ludlow VT
   inventory_orders: DORCAS
   everything_else: KYLE
   vendor_coordination: KYLE
@@ -39,6 +40,18 @@ vendors:
     contact: UNKNOWN
     external: true
 
+  - id: BEATA
+    name: "Beata Balazsi"
+    email: beatab1977@hotmail.com
+    role: "Cleaner — 61 Pleasant St, Ludlow VT"
+    covers: [NEHC-P-LUDLOW]
+    confirmed_by: "Will, 2026-09-15"
+    joined_slack: 2026-02-13
+    rates: UNKNOWN
+    insurance_on_file: UNKNOWN
+    w9_on_file: UNKNOWN
+    external: true
+
   - id: CHRIS-ONEIL
     name: "Chris O'Neil"
     role: "Handyman / plumbing"
@@ -64,9 +77,11 @@ vendors:
 
 coverage_gaps:
   - property: NEHC-P-LUDLOW
-    gap: "No housekeeping vendor, no handyman, no local contact identified.
-          Property is live and has Dec 26 - Jan 1 booked."
-    severity: HIGH
+    gap: "Housekeeping is covered (Beata Balazsi, confirmed 2026-09-15). Still NO handyman,
+          plumber or maintenance vendor identified for Vermont. Chris O'Neil and Matt both
+          serve the NH properties. Ludlow has Dec 26 - Jan 1 booked."
+    severity: MEDIUM
+    was: HIGH
 
 service_providers_not_connected:
   - { name: Turno,  role: "Turnover scheduling", status: "not connected / existence UNKNOWN" }
