@@ -45,6 +45,7 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
     minimum booked nights. Ranking (criteria["rank_by"]):
       "town" (default): town priority, lake/dock signal, rating, review count
       "adr": AirROI trailing-12-month average nightly rate, highest first (premium tier)
+      "revenue": AirROI trailing-12-month revenue, highest first (top performers)
     Comps with more bedrooms than the subject are flagged c["_larger"] for labeling.
     """
     notes: list[str] = []
@@ -87,6 +88,9 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
             notes.append(f"Fewer than {criteria['count']} candidates rated {min_rating}+; rating filter relaxed.")
 
     def sort_key(c):
+        if criteria.get("rank_by") == "revenue":
+            return (-(float(c["revenue"]) if c.get("revenue") is not None else 0),
+                    -(float(c["rating"]) if c.get("rating") is not None else 0))
         if criteria.get("rank_by") == "adr":
             return (-(float(c["adr"]) if c.get("adr") is not None else 0),
                     -(float(c["rating"]) if c.get("rating") is not None else 0))
@@ -133,7 +137,9 @@ def scenarios(comps: list[dict], estimate: dict | None) -> dict:
         market_p75 = float(market_p75) if market_p75 else None
 
     base = (comp_median + market) / 2 if (comp_median and market) else (comp_median or market)
-    conservative = pct(revs, 0.25)
+    # Conservative never sits above the base: the lower of the comp 25th percentile and
+    # AirROI's location estimate for a typical home.
+    conservative = min(x for x in (pct(revs, 0.25), market) if x is not None) if (revs or market) else None
     optimistic = max(x for x in (pct(revs, 0.75), market_p75, base) if x is not None) if base else None
     days_used = round(median(days)) if days else 365
 
@@ -147,8 +153,15 @@ def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     if comp_median and market:
         agreement = abs(comp_median - market) / max(comp_median, market)
 
+    cons_tier = tier(conservative, pct(occs, 0.25))
+    if conservative is not None and market is not None and conservative == market and estimate:
+        # Conservative is AirROI's typical-home estimate: show that estimate's own occupancy and ADR.
+        occ_e, adr_e = estimate.get("occupancy"), estimate.get("average_daily_rate")
+        if occ_e is not None and adr_e is not None:
+            cons_tier = {"revenue": market, "occupancy": float(occ_e), "adr": float(adr_e), "source": "estimate"}
+
     return {
-        "conservative": tier(conservative, pct(occs, 0.25)),
+        "conservative": cons_tier,
         "base": tier(base, median(occs) if occs else None),
         "optimistic": tier(optimistic, pct(occs, 0.75)),
         "comp_median_revenue": comp_median,

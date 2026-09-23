@@ -1,0 +1,110 @@
+{
+  "request": {
+    "path": "/listings/metrics/all",
+    "params": {
+      "listing_id": 619034599472003638,
+      "num_months": 12,
+      "currency": "usd"
+    }
+  },
+  "response": {
+    "results": [
+      {
+        "date": "2025-09",
+        "occupancy": 0.233,
+        "average_daily_rate": 697.0,
+        "rev_par": 162.63333333333333,
+        "revenue": 4879.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2025-10",
+        "occupancy": 0.71,
+        "average_daily_rate": 614.5,
+        "rev_par": 436.1290322580645,
+        "revenue": 13520.0,
+        "min_nights": 3
+      },
+      {
+        "date": "2025-11",
+        "occupancy": 0.1,
+        "average_daily_rate": 723.3,
+        "rev_par": 72.33333333333333,
+        "revenue": 2170.0,
+        "min_nights": 3
+      },
+      {
+        "date": "2025-12",
+        "occupancy": 0.323,
+        "average_daily_rate": 838.9,
+        "rev_par": 270.61290322580646,
+        "revenue": 8389.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-01",
+        "occupancy": 0.29,
+        "average_daily_rate": 701.9,
+        "rev_par": 203.7741935483871,
+        "revenue": 6317.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-02",
+        "occupancy": 0.357,
+        "average_daily_rate": 769.6,
+        "rev_par": 274.85714285714283,
+        "revenue": 7696.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-03",
+        "occupancy": 0.355,
+        "average_daily_rate": 606.9,
+        "rev_par": 215.3548387096774,
+        "revenue": 6676.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-04",
+        "occupancy": 0.433,
+        "average_daily_rate": 606.1,
+        "rev_par": 262.6333333333333,
+        "revenue": 7879.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-05",
+        "occupancy": 0.226,
+        "average_daily_rate": 765.0,
+        "rev_par": 172.74193548387098,
+        "revenue": 5355.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-06",
+        "occupancy": 0.7,
+        "average_daily_rate": 1012.6,
+        "rev_par": 708.8,
+        "revenue": 21264.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-07",
+        "occupancy": 1.0,
+        "average_daily_rate": 1132.1,
+        "rev_par": 1132.1290322580646,
+        "revenue": 35096.0,
+        "min_nights": 2
+      },
+      {
+        "date": "2026-08",
+        "occupancy": 0.935,
+        "average_daily_rate": 1065.9,
+        "rev_par": 997.0967741935484,
+        "revenue": 30910.0,
+        "min_nights": 2
+      }
+    ]
+  }
+}

@@ -186,8 +186,13 @@ def occupancy_note(comps: list[dict], sc: dict, market_occ: dict | None, seasona
                      f"over the last 12 months.")
     if seasonal and seasonal.get("season") is not None:
         parts.append(f" In the summer rate-card season ({season_label(season_months)}) they averaged "
-                     f"<strong>{pct(seasonal['season'])}</strong>. Most of their bookings fall in summer, and several "
-                     f"took few or no bookings from November to April, which pulls the 12-month figure down.")
+                     f"<strong>{pct(seasonal['season'])}</strong>")
+        sh = seasonal.get("shoulder")
+        if sh is not None:
+            parts.append(f" and from November to April {pct(sh)}"
+                         + (", so most of their bookings fall in summer." if sh < 0.15 else "."))
+        else:
+            parts.append(".")
     if market_occ:
         parts.append(
             f" In AirROI's data for this area, higher nightly rates come with lower occupancy: "
@@ -222,7 +227,10 @@ def selection_lines(crit: dict) -> str:
         lines.append(f"At least {crit['min_reviews']} reviews, rated {crit.get('min_rating', '')}+")
     if crit.get("min_nights_booked"):
         lines.append(f"At least {crit['min_nights_booked']} nights booked in the last 12 months (an established, active listing)")
-    if crit.get("rank_by") == "adr":
+    if crit.get("rank_by") == "revenue":
+        lines.append("Ranked by AirROI trailing-12-month revenue, highest first: these are the top-performing lake "
+                     "homes in the search, not the average home")
+    elif crit.get("rank_by") == "adr":
         lines.append("Ranked by AirROI trailing-12-month average nightly rate, highest first, to represent the premium tier")
     else:
         lines.append("Lakefront or lake access with dock ranked first; then rating and review count")
@@ -490,7 +498,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
       <li>{e(subject['criteria_text'])}</li>
       {selection_lines(subject['criteria'])}</ul></div>
     <div class="info"><b class="t">Scenario math</b><ul>
-      <li><b>Conservative:</b> 25th percentile of comp annual revenue</li>
+      <li><b>Conservative:</b> the lower of the comp 25th percentile and AirROI's location estimate for a typical home (when it is the estimate, it is shown with the estimate's own occupancy and ADR)</li>
       <li><b>Base:</b> average of the comp median and AirROI's location estimate</li>
       <li><b>Optimistic:</b> the highest of the comp 75th percentile, AirROI's 75th-percentile estimate and the base case</li>
       <li>Occupancy is on open nights: AirROI nights booked &divide; nights open to guests (total days minus blocked days). Each scenario uses the matching comp percentile</li>

@@ -34,13 +34,13 @@ python3 str-comping-agent/run.py SUBJECT.json --from-raw output/data/<slug>
    - otherwise: AirROI `GET /listings/comparables` at the subject, then at each backup town, once per bedroom count.
 4. Filters to the criteria: bedrooms, guests, has trailing-12-month revenue, optional `require_water`,
    `min_reviews`, `min_rating` and `min_nights_booked` (so a nightly rate only counts if it was actually booked).
-   Ranks by `rank_by`: `"adr"` (AirROI nightly rate, highest first, for the premium tier) or `"town"` (town priority,
+   Ranks by `rank_by`: `"revenue"` (AirROI 12-month revenue, highest first, top performers), `"adr"` (AirROI nightly rate, highest first, premium tier) or `"town"` (town priority,
    then lake or dock signal, rating and reviews). Keeps the top N. Comps with more bedrooms than the subject are
    labeled "Larger home" on their cards.
    Then AirROI `GET /listings/metrics/all` for each chosen comp: 12 months of monthly occupancy and revenue, used for
    peak (May-Oct) vs shoulder (Nov-Apr) occupancy and for the monthly revenue chart.
 5. Scenarios (all annual):
-   - Conservative: 25th percentile of comp revenue
+   - Conservative: the lower of the comp 25th percentile and AirROI's location estimate (never above the base)
    - Base: average of the comp median and AirROI's location estimate
    - Optimistic: the highest of the comp 75th percentile, AirROI's p75 estimate and the base case
    - Occupancy is on open nights: AirROI `ttm_adjusted_occupancy` (nights booked / nights open to guests). Each scenario uses the matching comp percentile. ADR = revenue / (occupancy x median open nights of the comps), which recovers revenue per booked night.

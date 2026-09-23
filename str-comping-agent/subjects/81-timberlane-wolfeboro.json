@@ -58,7 +58,7 @@
     "min_rating": 4.8,
     "min_reviews": 3,
     "require_water": true,
-    "rank_by": "adr",
+    "rank_by": "revenue",
     "radius_search": {
       "radius_miles": 12,
       "amenities_any": [
