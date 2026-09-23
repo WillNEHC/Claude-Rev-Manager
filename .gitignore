@@ -39,3 +39,5 @@ supabase/.temp
 # Next.js generated
 next-env.d.ts
 *.tsbuildinfo
+__pycache__/
+*.pyc
