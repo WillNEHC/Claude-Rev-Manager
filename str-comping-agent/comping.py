@@ -1,0 +1,172 @@
+"""Comp selection and revenue scenarios. Pure functions -- no network, no estimation.
+
+Every number produced here is either a real AirROI value or plain arithmetic on
+real AirROI values (percentiles, medians, averages). The arithmetic is spelled
+out in the report's methodology section.
+"""
+from __future__ import annotations
+
+import math
+from statistics import median
+
+LAKE_KEYWORDS = ("lake", "waterfront", "water front", "beachfront", "beach access", "boat slip",
+                 "dock", "private beach", "kayak")
+
+
+def is_lake(comp: dict) -> bool:
+    text = " ".join([str(comp.get("name") or "")] + [str(a) for a in (comp.get("amenities") or [])]).lower()
+    return any(k in text for k in LAKE_KEYWORDS)
+
+
+def haversine_mi(lat1, lng1, lat2, lng2) -> float | None:
+    if None in (lat1, lng1, lat2, lng2):
+        return None
+    r = 3958.8
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = p2 - p1, math.radians(lng2 - lng1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(a))
+
+
+def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subject_lng=None) -> tuple[list[dict], list[str]]:
+    """Filter + rank candidates. Returns (chosen, notes).
+
+    Hard filters: has AirROI ttm revenue; bedrooms and guests inside the criteria
+    range when AirROI returns them. Ranking: town priority (primary town first,
+    then the listed nearby towns), lake/dock signal, rating, review count.
+    """
+    notes: list[str] = []
+    bmin, bmax = criteria["bedrooms"]
+    gmin, gmax = criteria["guests"]
+    towns = [t.lower() for t in criteria["towns"]]
+    seen: set = set()
+    pool = []
+    for c in candidates:
+        key = c.get("listing_id") or (c.get("name"), c.get("lat"), c.get("lng"))
+        if key in seen:
+            continue
+        seen.add(key)
+        if c.get("revenue") in (None, 0):
+            continue
+        if c.get("bedrooms") is not None and not (bmin <= float(c["bedrooms"]) <= bmax):
+            continue
+        if c.get("guests") is not None and not (gmin <= float(c["guests"]) <= gmax):
+            continue
+        city = (c.get("city") or "").lower()
+        c["_town_rank"] = next((i for i, t in enumerate(towns) if t[:8] in city), len(towns))  # "Moultonboro" == "Moultonborough"
+        c["_distance_mi"] = haversine_mi(subject_lat, subject_lng, c.get("lat"), c.get("lng"))
+        c["_lake"] = is_lake(c)
+        pool.append(c)
+
+    min_rating = criteria.get("min_rating")
+    if min_rating:
+        strong = [c for c in pool if c.get("rating") is None or float(c["rating"]) >= min_rating]
+        if len(strong) >= criteria["count"]:
+            pool = strong
+        else:
+            notes.append(f"Fewer than {criteria['count']} candidates rated {min_rating}+; rating filter relaxed.")
+
+    def sort_key(c):
+        return (c["_town_rank"], 0 if c["_lake"] else 1,
+                -(float(c["rating"]) if c.get("rating") is not None else 0),
+                -(int(c["reviews"]) if c.get("reviews") is not None else 0),
+                c["_distance_mi"] if c["_distance_mi"] is not None else 999)
+
+    pool.sort(key=sort_key)
+    chosen = pool[: criteria["count"]]
+    primary = [c for c in chosen if c["_town_rank"] == 0]
+    if len(primary) < criteria["count"]:
+        notes.append(f"{criteria['towns'][0]} returned {len(primary)} qualifying comp(s); "
+                     f"filled from nearby towns ({', '.join(criteria['towns'][1:])}).")
+    if len(chosen) < criteria["count"]:
+        notes.append(f"Only {len(chosen)} comps met the criteria (asked for {criteria['count']}).")
+    return chosen, notes
+
+
+def pct(values: list[float], p: float) -> float | None:
+    """Linear-interpolated percentile (same method as Excel PERCENTILE.INC)."""
+    vals = sorted(v for v in values if v is not None)
+    if not vals:
+        return None
+    k = (len(vals) - 1) * p
+    lo, hi = math.floor(k), math.ceil(k)
+    return vals[lo] + (vals[hi] - vals[lo]) * (k - lo)
+
+
+def scenarios(comps: list[dict], estimate: dict | None) -> dict:
+    revs = [float(c["revenue"]) for c in comps if c.get("revenue") is not None]
+    occs = [float(c["occupancy"]) for c in comps if c.get("occupancy") is not None]
+    days = [float(c["days_available"]) for c in comps if c.get("days_available") is not None]
+    adrs = [float(c["adr"]) for c in comps if c.get("adr") is not None]
+
+    comp_median = median(revs) if revs else None
+    market = float(estimate["revenue"]) if estimate and estimate.get("revenue") else None
+    market_p75 = None
+    if estimate:
+        market_p75 = (((estimate.get("percentiles") or {}).get("revenue") or {}).get("p75"))
+        market_p75 = float(market_p75) if market_p75 else None
+
+    base = (comp_median + market) / 2 if (comp_median and market) else (comp_median or market)
+    conservative = pct(revs, 0.25)
+    optimistic = max(x for x in (pct(revs, 0.75), market_p75, base) if x is not None) if base else None
+    days_used = round(median(days)) if days else 365
+
+    def tier(rev, occ):
+        if rev is None:
+            return None
+        adr = rev / (occ * days_used) if occ else None
+        return {"revenue": rev, "occupancy": occ, "adr": adr}
+
+    agreement = None
+    if comp_median and market:
+        agreement = abs(comp_median - market) / max(comp_median, market)
+
+    return {
+        "conservative": tier(conservative, pct(occs, 0.25)),
+        "base": tier(base, median(occs) if occs else None),
+        "optimistic": tier(optimistic, pct(occs, 0.75)),
+        "comp_median_revenue": comp_median,
+        "market_model_revenue": market,
+        "market_model_p75": market_p75,
+        "methods_gap": agreement,
+        "days_used": days_used,
+        "days_from_comps": bool(days),
+        "occ_range": (min(occs), max(occs)) if occs else None,
+        "adr_range": (min(adrs), max(adrs)) if adrs else None,
+    }
+
+
+def monthly_split(estimate: dict | None, annual: float | None) -> list[float] | None:
+    """Scale AirROI's 12-month revenue distribution to the base-case annual total."""
+    if not estimate or not annual:
+        return None
+    dist = estimate.get("monthly_revenue_distributions")
+    if not isinstance(dist, list) or len(dist) != 12:
+        return None
+    vals = [float(v.get("revenue", 0) if isinstance(v, dict) else v or 0) for v in dist]
+    total = sum(vals)
+    if total <= 0:
+        return None
+    return [annual * v / total for v in vals]
+
+
+def rate_card_comparison(rate_card: dict, base: float | None, months: list[float] | None, sc: dict) -> dict:
+    """Numbers for the rate-card vs comp-projection box. Plain arithmetic only."""
+    weeks = sum(p["weeks"] for p in rate_card["periods"])
+    total = sum(p["weeks"] * p["weekly_rate"] for p in rate_card["periods"])
+    nights = weeks * 7
+    out = {
+        "weeks": weeks, "total": total, "nights": nights,
+        "implied_nightly": total / nights,
+        "gap": (total - base) if base else None,
+        "summer_share": None, "comp_summer_revenue": None,
+    }
+    if months:
+        idx = [m - 1 for m in rate_card["season_months"]]
+        summer = sum(months[i] for i in idx)
+        out["comp_summer_revenue"] = summer
+        out["summer_share"] = summer / sum(months)
+    base_adr = (sc.get("base") or {}).get("adr")
+    out["base_adr"] = base_adr
+    out["adr_multiple"] = (out["implied_nightly"] / base_adr) if base_adr else None
+    return out

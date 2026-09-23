@@ -1,0 +1,43 @@
+{
+  "slug": "81-timberlane-wolfeboro",
+  "output_name": "STR-Income-Analysis-81-Timberlane-Wolfeboro",
+  "name": "81 Timberlane",
+  "address": "81 Timberlane, Wolfeboro, NH 03894",
+  "state": "NH",
+  "lat": null,
+  "lng": null,
+  "listing_url": "https://winnire.com/rentals/timberlane-wolfeboro",
+  "photo_url": "https://res.cloudinary.com/dremqdkm5/image/upload/f_auto,q_auto,c_fill,w_1200,h_800/yankee-pedlar/properties/534/cc3pguukokxgrp8srham",
+  "bedrooms": 4,
+  "baths": 4.5,
+  "guests": 10,
+  "beds_note": "4 queen beds",
+  "positioning": "Lakefront on Lake Winnipesaukee's Wolfeboro Bay, under 5 minutes to downtown Wolfeboro. Occupancy is capped at 10 guests by town regulations and septic capacity.",
+  "highlights": [
+    "Lakefront, Wolfeboro Bay",
+    "Private sandy perched beach",
+    "2 electric dock slips",
+    "Southwest sunset exposure",
+    "Game room: pool table, shuffleboard, bar",
+    "Stone fireplace",
+    "Central A/C",
+    "Under 5 min to downtown"
+  ],
+  "rate_card": {
+    "source": "Published 2027 weekly rates, Yankee Pedlar (winnire.com)",
+    "note": "Rented weekly in summer only through Yankee Pedlar. Published 2027 rates below.",
+    "season_months": [6, 7, 8, 9],
+    "periods": [
+      {"label": "Jun 5 - 19 and Sep 4 - 18 (week starts)", "weeks": 6, "weekly_rate": 13000},
+      {"label": "Jun 26 - Aug 28 (week starts)", "weeks": 10, "weekly_rate": 15000}
+    ]
+  },
+  "criteria": {
+    "count": 6,
+    "bedrooms": [4, 5],
+    "guests": [8, 12],
+    "min_rating": 4.8,
+    "towns": ["Wolfeboro", "Tuftonboro", "Alton", "Moultonborough"]
+  },
+  "criteria_text": "4-5 bedrooms, sleeps 8-12, lakefront or lake access with dock preferred, rated 4.8+ where enough comps qualify"
+}
