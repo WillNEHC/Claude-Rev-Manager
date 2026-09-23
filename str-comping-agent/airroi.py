@@ -9,6 +9,10 @@ Endpoints (https://www.airroi.com/api/documentation, auth header X-API-KEY):
          monthly_revenue_distributions[12], comparable_listings[...]
   GET /listings/comparables  (lat+lng | address), bedrooms, baths, guests[, currency]
       -> listings[...]
+  POST /listings/search/radius  latitude, longitude, radius_miles, filter, sort, pagination (10/page)
+      -> results[...], pagination.total_count
+  GET /listings/metrics/all  listing_id, num_months[, currency]
+      -> results[{date, occupancy, average_daily_rate, rev_par, revenue}]
 
 Listing records are nested: listing_info / property_details / location_info /
 ratings / performance_metrics. FIELD_MAP lists the key paths tried for each
@@ -48,8 +52,10 @@ FIELD_MAP: dict[str, list[str]] = {
                           "performance_metrics.ttm_potential_revenue"],
     "occupancy": ["performance_metrics.ttm_occupancy"],
     "adr": ["performance_metrics.ttm_avg_rate", "performance_metrics.ttm_adr"],
-    "days_available": ["performance_metrics.ttm_available_days",
-                       "performance_metrics.ttm_days_available"],
+    # Days Available = ttm_total_days - ttm_blocked_days (nights open to guests, booked or not).
+    # AirROI's ttm_available_days is only the open nights that went unbooked.
+    "total_days": ["performance_metrics.ttm_total_days"],
+    "blocked_days": ["performance_metrics.ttm_blocked_days"],
     "nights_booked": ["performance_metrics.ttm_days_reserved",
                       "performance_metrics.ttm_reserved_days", "performance_metrics.ttm_booked_days"],
 }
@@ -96,7 +102,10 @@ def normalize_occupancy(val: Any) -> float | None:
 
 
 def flatten(listing: dict) -> dict:
-    return {name: field(listing, name) for name in FIELD_MAP}
+    out = {name: field(listing, name) for name in FIELD_MAP}
+    total, blocked = out["total_days"], out.pop("blocked_days")
+    out["days_available"] = (float(total) - float(blocked)) if None not in (total, blocked) else None
+    return out
 
 
 class Client:
@@ -107,10 +116,14 @@ class Client:
         self.raw_dir = raw_dir
         self.calls = 0
 
-    def _get(self, path: str, params: dict, save_as: str) -> dict:
+    def _get(self, path: str, params: dict, save_as: str, *, body: dict | None = None) -> dict:
         try:
-            resp = requests.get(f"{BASE_URL}{path}", params=params,
-                                headers={"X-API-KEY": self.api_key}, timeout=60)
+            if body is None:
+                resp = requests.get(f"{BASE_URL}{path}", params=params,
+                                    headers={"X-API-KEY": self.api_key}, timeout=60)
+            else:
+                resp = requests.post(f"{BASE_URL}{path}", json=body,
+                                     headers={"X-API-KEY": self.api_key}, timeout=60)
         except requests.RequestException as ex:
             raise AirROIError(f"{path} -> cannot reach AirROI ({ex.__class__.__name__})") from ex
         self.calls += 1
@@ -119,9 +132,35 @@ class Client:
         data = resp.json()
         if self.raw_dir:
             self.raw_dir.mkdir(parents=True, exist_ok=True)
+            request = {"path": path, "params": params} if body is None else {"path": path, "body": body}
             (self.raw_dir / f"{save_as}.json").write_text(json.dumps(
-                {"request": {"path": path, "params": params}, "response": data}, indent=2))
+                {"request": request, "response": data}, indent=2))
         return data
+
+    def search_radius(self, lat: float, lng: float, radius_miles: float, filt: dict, *,
+                      sort: dict | None = None, max_pages: int = 5, tag: str = "") -> list[dict]:
+        """POST /listings/search/radius, 10 per page (AirROI maximum), until exhausted or max_pages."""
+        out: list[dict] = []
+        for page in range(max_pages):
+            body = {"latitude": lat, "longitude": lng, "radius_miles": radius_miles, "filter": filt,
+                    "pagination": {"page_size": 10, "offset": page * 10}, "currency": "usd"}
+            if sort:
+                body["sort"] = sort
+            data = self._get("/listings/search/radius", {}, f"search-radius{tag}-p{page + 1}", body=body)
+            got = listings_of(data)
+            out += got
+            total = ((data.get("pagination") or {}).get("total_count")
+                     if isinstance(data, dict) else None)
+            if len(got) < 10 or (total is not None and len(out) >= total):
+                break
+        return out
+
+    def monthly_metrics(self, listing_id: int, num_months: int = 12) -> list[dict]:
+        """GET /listings/metrics/all: per-month occupancy, ADR and revenue for one listing."""
+        data = self._get("/listings/metrics/all",
+                         {"listing_id": listing_id, "num_months": num_months, "currency": "usd"},
+                         f"metrics-{listing_id}")
+        return listings_of(data)
 
     def estimate(self, lat: float, lng: float, bedrooms: int, baths: float, guests: int) -> dict:
         return self._get("/calculator/estimate",

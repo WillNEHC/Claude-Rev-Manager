@@ -13,6 +13,14 @@ LAKE_KEYWORDS = ("lake", "waterfront", "water front", "beachfront", "beach acces
                  "dock", "private beach", "kayak")
 
 
+WATER_AMENITIES = ("waterfront", "lake access", "boat slip")
+
+
+def has_water_amenity(comp: dict) -> bool:
+    """AirROI amenity list includes waterfront, lake access or boat slip."""
+    return any(str(a).lower().replace("_", " ") in WATER_AMENITIES for a in (comp.get("amenities") or []))
+
+
 def is_lake(comp: dict) -> bool:
     text = " ".join([str(comp.get("name") or "")] + [str(a) for a in (comp.get("amenities") or [])]).lower()
     return any(k in text for k in LAKE_KEYWORDS)
@@ -28,17 +36,21 @@ def haversine_mi(lat1, lng1, lat2, lng2) -> float | None:
     return 2 * r * math.asin(math.sqrt(a))
 
 
-def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subject_lng=None) -> tuple[list[dict], list[str]]:
+def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subject_lng=None,
+                 subject_bedrooms=None) -> tuple[list[dict], list[str]]:
     """Filter + rank candidates. Returns (chosen, notes).
 
     Hard filters: has AirROI ttm revenue; bedrooms and guests inside the criteria
-    range when AirROI returns them. Ranking: town priority (primary town first,
-    then the listed nearby towns), lake/dock signal, rating, review count.
+    range when AirROI returns them; optional water amenity, minimum reviews and
+    minimum booked nights. Ranking (criteria["rank_by"]):
+      "town" (default): town priority, lake/dock signal, rating, review count
+      "adr": AirROI trailing-12-month average nightly rate, highest first (premium tier)
+    Comps with more bedrooms than the subject are flagged c["_larger"] for labeling.
     """
     notes: list[str] = []
     bmin, bmax = criteria["bedrooms"]
     gmin, gmax = criteria["guests"]
-    towns = [t.lower() for t in criteria["towns"]]
+    towns = [t.lower() for t in criteria.get("towns", [])]
     seen: set = set()
     pool = []
     for c in candidates:
@@ -52,6 +64,14 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
             continue
         if c.get("guests") is not None and not (gmin <= float(c["guests"]) <= gmax):
             continue
+        if criteria.get("require_water") and not has_water_amenity(c):
+            continue
+        if criteria.get("min_reviews") and (c.get("reviews") or 0) < criteria["min_reviews"]:
+            continue
+        if criteria.get("min_nights_booked") and (c.get("nights_booked") or 0) < criteria["min_nights_booked"]:
+            continue
+        c["_larger"] = (subject_bedrooms is not None and c.get("bedrooms") is not None
+                        and float(c["bedrooms"]) > float(subject_bedrooms))
         city = (c.get("city") or "").lower()
         c["_town_rank"] = next((i for i, t in enumerate(towns) if t[:8] in city), len(towns))  # "Moultonboro" == "Moultonborough"
         c["_distance_mi"] = haversine_mi(subject_lat, subject_lng, c.get("lat"), c.get("lng"))
@@ -67,6 +87,9 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
             notes.append(f"Fewer than {criteria['count']} candidates rated {min_rating}+; rating filter relaxed.")
 
     def sort_key(c):
+        if criteria.get("rank_by") == "adr":
+            return (-(float(c["adr"]) if c.get("adr") is not None else 0),
+                    -(float(c["rating"]) if c.get("rating") is not None else 0))
         return (c["_town_rank"], 0 if c["_lake"] else 1,
                 -(float(c["rating"]) if c.get("rating") is not None else 0),
                 -(int(c["reviews"]) if c.get("reviews") is not None else 0),
@@ -75,7 +98,7 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
     pool.sort(key=sort_key)
     chosen = pool[: criteria["count"]]
     primary = [c for c in chosen if c["_town_rank"] == 0]
-    if len(primary) < criteria["count"]:
+    if towns and criteria.get("rank_by", "town") == "town" and len(primary) < criteria["count"]:
         notes.append(f"{criteria['towns'][0]} returned {len(primary)} qualifying comp(s); "
                      f"filled from nearby towns ({', '.join(criteria['towns'][1:])}).")
     if len(chosen) < criteria["count"]:
@@ -96,10 +119,9 @@ def pct(values: list[float], p: float) -> float | None:
 def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     revs = [float(c["revenue"]) for c in comps if c.get("revenue") is not None]
     occs = [float(c["occupancy"]) for c in comps if c.get("occupancy") is not None]
-    # AirROI's ttm_available_days counts open nights that went unbooked, and its occupancy is
-    # booked / (unbooked + booked). The nights the listing was open is therefore the sum.
-    days = [float(c["days_available"]) + float(c["nights_booked"]) for c in comps
-            if c.get("days_available") is not None and c.get("nights_booked") is not None]
+    # AirROI occupancy = nights booked / ttm_total_days (the full year, blocked nights included),
+    # so revenue / (occupancy x total days) recovers revenue per booked night.
+    days = [float(c["total_days"]) for c in comps if c.get("total_days") is not None]
     adrs = [float(c["adr"]) for c in comps if c.get("adr") is not None]
 
     comp_median = median(revs) if revs else None
@@ -139,9 +161,51 @@ def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     }
 
 
-def monthly_split(estimate: dict | None, annual: float | None) -> list[float] | None:
-    """Scale AirROI's 12-month revenue distribution to the base-case annual total."""
-    if not estimate or not annual:
+PEAK_MONTHS = (5, 6, 7, 8, 9, 10)  # May-Oct, as in the reference reports; Nov-Apr is shoulder
+
+
+def seasonal_occupancy(metrics_by_comp: dict) -> dict | None:
+    """Average monthly occupancy across the comp set, peak (May-Oct) vs shoulder (Nov-Apr).
+
+    metrics_by_comp: {listing_id: [ {date: 'YYYY-MM', occupancy: 0-1, ...}, ... ]} from
+    AirROI /listings/metrics/all. Plain averages of AirROI's monthly values.
+    """
+    peak, shoulder, used = [], [], 0
+    month_rev = [0.0] * 12
+    for rows in metrics_by_comp.values():
+        got = False
+        for r in rows or []:
+            occ, date = r.get("occupancy"), str(r.get("date") or "")
+            if occ is None or len(date) < 7:
+                continue
+            occ = float(occ) / 100 if float(occ) > 1 else float(occ)
+            (peak if int(date[5:7]) in PEAK_MONTHS else shoulder).append(occ)
+            if r.get("revenue") is not None:
+                month_rev[int(date[5:7]) - 1] += float(r["revenue"])
+            got = True
+        used += got
+    if not peak and not shoulder:
+        return None
+    return {"peak": sum(peak) / len(peak) if peak else None,
+            "shoulder": sum(shoulder) / len(shoulder) if shoulder else None,
+            "comps_used": used,
+            # combined AirROI monthly revenue of the comp set, Jan..Dec
+            "monthly_revenue": month_rev if sum(month_rev) > 0 else None}
+
+
+def monthly_split(estimate: dict | None, annual: float | None,
+                  comp_monthly: list[float] | None = None) -> list[float] | None:
+    """Scale a 12-month revenue pattern to the base-case annual total.
+
+    Uses the comp set's own AirROI monthly revenue when available, else AirROI's
+    location-level monthly_revenue_distributions from the estimate.
+    """
+    if not annual:
+        return None
+    if comp_monthly and len(comp_monthly) == 12 and sum(comp_monthly) > 0:
+        total = sum(comp_monthly)
+        return [annual * v / total for v in comp_monthly]
+    if not estimate:
         return None
     dist = estimate.get("monthly_revenue_distributions")
     if not isinstance(dist, list) or len(dist) != 12:

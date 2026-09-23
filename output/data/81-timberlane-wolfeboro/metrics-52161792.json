@@ -1,0 +1,110 @@
+{
+  "request": {
+    "path": "/listings/metrics/all",
+    "params": {
+      "listing_id": 52161792,
+      "num_months": 12,
+      "currency": "usd"
+    }
+  },
+  "response": {
+    "results": [
+      {
+        "date": "2025-09",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2025-10",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2025-11",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2025-12",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-01",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-02",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-03",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-04",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-05",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-06",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-07",
+        "occupancy": 0.226,
+        "average_daily_rate": 1312.0,
+        "rev_par": 296.258064516129,
+        "revenue": 9184.0,
+        "min_nights": 7
+      },
+      {
+        "date": "2026-08",
+        "occupancy": 0.0,
+        "average_daily_rate": 0.0,
+        "rev_par": 0.0,
+        "revenue": 0.0,
+        "min_nights": 7
+      }
+    ]
+  }
+}

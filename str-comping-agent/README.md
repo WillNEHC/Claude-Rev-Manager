@@ -27,14 +27,23 @@ python3 str-comping-agent/run.py SUBJECT.json --from-raw output/data/<slug>
 1. Geocodes the subject address (US Census geocoder) unless `lat`/`lng` are set in the subject file.
 2. AirROI `GET /calculator/estimate` at the subject: location revenue estimate, percentiles,
    12-month revenue distribution and the comparable listings behind it.
-3. AirROI `GET /listings/comparables` at the subject, then at each backup town, once per bedroom count in range.
-4. Filters to the criteria (bedrooms, guests, has trailing-12-month revenue, minimum rating when
-   enough comps qualify). Ranks by town priority, then lake or dock signal, rating and reviews. Keeps the top N.
+3. Comp candidates, one of two modes set in the subject's `criteria`:
+   - `radius_search` (preferred): AirROI `POST /listings/search/radius` around the subject, entire homes in the
+     bedroom and guest ranges with the listed amenity codes (for example `waterfront`, `lake_access`, `boat_slip`).
+     Pulls every page (10 per page), so the whole matching pool is considered.
+   - otherwise: AirROI `GET /listings/comparables` at the subject, then at each backup town, once per bedroom count.
+4. Filters to the criteria: bedrooms, guests, has trailing-12-month revenue, optional `require_water`,
+   `min_reviews`, `min_rating` and `min_nights_booked` (so a nightly rate only counts if it was actually booked).
+   Ranks by `rank_by`: `"adr"` (AirROI nightly rate, highest first, for the premium tier) or `"town"` (town priority,
+   then lake or dock signal, rating and reviews). Keeps the top N. Comps with more bedrooms than the subject are
+   labeled "Larger home" on their cards.
+   Then AirROI `GET /listings/metrics/all` for each chosen comp: 12 months of monthly occupancy and revenue, used for
+   peak (May-Oct) vs shoulder (Nov-Apr) occupancy and for the monthly revenue chart.
 5. Scenarios (all annual):
    - Conservative: 25th percentile of comp revenue
    - Base: average of the comp median and AirROI's location estimate
    - Optimistic: the highest of the comp 75th percentile, AirROI's p75 estimate and the base case
-   - The occupancy shown for each scenario is the matching comp percentile. ADR = revenue / (occupancy x available nights), where available nights = AirROI `ttm_available_days` (open, unbooked) + `ttm_days_reserved` (booked).
+   - The occupancy shown for each scenario is the matching comp percentile. ADR = revenue / (occupancy x AirROI `ttm_total_days`). AirROI occupancy is nights booked / total days in the trailing year, so this recovers revenue per booked night.
 6. Compares the base case with the property's published rate card, if it has one.
 
 ## Data integrity

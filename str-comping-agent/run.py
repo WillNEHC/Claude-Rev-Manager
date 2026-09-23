@@ -53,9 +53,10 @@ CARD_FIELDS = {"photo": "photo", "guests": "sleeps", "bedrooms": "bedrooms", "ba
                "nights_booked": "Nights Booked"}
 
 
-def pull(subject: dict, raw_dir: Path) -> tuple[list[dict], dict | None, tuple, list[str]]:
+def pull(subject: dict, raw_dir: Path):
     client = airroi.Client(raw_dir=raw_dir)
     notes = []
+    crit = subject["criteria"]
     lat, lng = subject.get("lat"), subject.get("lng")
     if lat is None or lng is None:
         geo = airroi.geocode_census(subject["address"])
@@ -71,33 +72,65 @@ def pull(subject: dict, raw_dir: Path) -> tuple[list[dict], dict | None, tuple, 
             candidates += airroi.listings_of(estimate)
         except airroi.AirROIError as ex:
             notes.append(f"AirROI estimate failed: {ex}")
-    for b in range(subject["criteria"]["bedrooms"][0], subject["criteria"]["bedrooms"][1] + 1):
+    rs = crit.get("radius_search")
+    if rs and lat is not None:
+        filt = {"room_type": {"eq": "entire_home"},
+                "bedrooms": {"range": list(crit["bedrooms"])},
+                "guests": {"range": list(crit["guests"])}}
+        if rs.get("amenities_any"):
+            filt["amenities"] = {"any": rs["amenities_any"]}
         try:
-            candidates += client.comparables(b, baths, guests, lat=lat, lng=lng,
-                                             address=None if lat is not None else subject["address"],
-                                             tag=f"-subject-{b}br")
+            found = client.search_radius(lat, lng, rs["radius_miles"], filt,
+                                         sort={"ttm_revenue": "desc"}, max_pages=rs.get("max_pages", 15))
+            candidates += found
+            notes.append(f"AirROI radius search: {len(found)} listings within {rs['radius_miles']:g} miles "
+                         f"matching {crit['bedrooms'][0]}-{crit['bedrooms'][1]} BR, sleeps "
+                         f"{crit['guests'][0]}-{crit['guests'][1]}, {', '.join(rs.get('amenities_any', []))}.")
         except airroi.AirROIError as ex:
-            notes.append(f"AirROI comparables ({b} BR, subject location) failed: {ex}")
-    for town in subject["criteria"]["towns"][1:]:
-        for b in range(subject["criteria"]["bedrooms"][0], subject["criteria"]["bedrooms"][1] + 1):
+            notes.append(f"AirROI radius search failed: {ex}")
+    else:
+        towns = crit.get("towns") or []
+        for b in range(crit["bedrooms"][0], crit["bedrooms"][1] + 1):
             try:
-                candidates += client.comparables(b, baths, guests, address=f"{town}, {subject['state']}",
-                                                 tag=f"-{town.lower()}-{b}br")
+                candidates += client.comparables(b, baths, guests, lat=lat, lng=lng,
+                                                 address=None if lat is not None else subject["address"],
+                                                 tag=f"-subject-{b}br")
             except airroi.AirROIError as ex:
-                notes.append(f"AirROI comparables ({town}, {b} BR) failed: {ex}")
-    notes.append(f"AirROI API calls made: {client.calls}.")
-    pulled = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    notes.insert(0, f"Live AirROI pull on {pulled}.")
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    (raw_dir / "pull.json").write_text(json.dumps({"pulled_at": pulled, "lat": lat, "lng": lng,
-                                                   "notes": notes}, indent=2))
-    return candidates, estimate, (lat, lng), notes
+                notes.append(f"AirROI comparables ({b} BR, subject location) failed: {ex}")
+        for town in towns[1:]:
+            for b in range(crit["bedrooms"][0], crit["bedrooms"][1] + 1):
+                try:
+                    candidates += client.comparables(b, baths, guests, address=f"{town}, {subject['state']}",
+                                                     tag=f"-{town.lower()}-{b}br")
+                except airroi.AirROIError as ex:
+                    notes.append(f"AirROI comparables ({town}, {b} BR) failed: {ex}")
+    return candidates, estimate, (lat, lng), notes, client
+
+
+def fetch_metrics(client, comps: list[dict], raw_dir: Path, notes: list[str]) -> dict:
+    """Monthly AirROI metrics for each chosen comp: live via client, else from saved files."""
+    out = {}
+    for c in comps:
+        lid = c.get("listing_id")
+        if lid is None:
+            continue
+        f = raw_dir / f"metrics-{lid}.json"
+        try:
+            if client is not None:
+                out[lid] = client.monthly_metrics(lid)
+            elif f.exists():
+                out[lid] = airroi.listings_of(json.loads(f.read_text()).get("response"))
+            else:
+                notes.append(f"{c.get('name')}: no saved AirROI monthly metrics (seasonal figures exclude it).")
+        except airroi.AirROIError as ex:
+            notes.append(f"{c.get('name')}: AirROI monthly metrics failed: {ex}")
+    return out
 
 
 def load_raw(raw_dir: Path) -> tuple[list[dict], dict | None]:
     estimate, candidates = None, []
     for f in sorted(raw_dir.glob("*.json")):
-        if f.stem in ("summary", "pull"):
+        if f.stem in ("summary", "pull") or f.stem.startswith("metrics-"):
             continue
         data = json.loads(f.read_text()).get("response")
         if f.stem == "estimate":
@@ -153,19 +186,29 @@ def main() -> int:
         lng = subject.get("lng") if subject.get("lng") is not None else pull_info.get("lng")
         notes = list(pull_info.get("notes", []))
         notes.append("Report rebuilt from the saved responses of that pull (no new API calls).")
+        client = None
     else:
-        candidates, estimate, (lat, lng), notes = pull(subject, raw_dir)
+        candidates, estimate, (lat, lng), notes, client = pull(subject, raw_dir)
+    pull_notes = list(notes)
 
     flat = [airroi.flatten(c) for c in candidates]
-    comps, sel_notes = comping.select_comps(flat, subject["criteria"], lat, lng)
+    comps, sel_notes = comping.select_comps(flat, subject["criteria"], lat, lng, subject["bedrooms"])
     notes += sel_notes
     if not comps:
         print("No comps with AirROI revenue matched the criteria. Nothing rendered.\n  "
               + "\n  ".join(notes), file=sys.stderr)
         return 2
+    seasonal = comping.seasonal_occupancy(fetch_metrics(client, comps, raw_dir, notes))
+    if client is not None:
+        pulled = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        pull_notes = [f"Live AirROI pull on {pulled}."] + pull_notes + [f"AirROI API calls made: {client.calls}."]
+        notes = pull_notes + notes[len(pull_notes) - 2:]
+        (raw_dir / "pull.json").write_text(json.dumps({"pulled_at": pulled, "lat": lat, "lng": lng,
+                                                       "notes": pull_notes}, indent=2))
 
     sc = comping.scenarios(comps, estimate)
-    months = comping.monthly_split(estimate, sc["base"]["revenue"])
+    months = comping.monthly_split(estimate, sc["base"]["revenue"],
+                                   (seasonal or {}).get("monthly_revenue"))
     rc = comping.rate_card_comparison(subject["rate_card"], sc["base"]["revenue"], months, sc)
 
     blanks = []
@@ -180,7 +223,7 @@ def main() -> int:
         if missing:
             blanks.append(f"{c.get('name')}: AirROI did not return {', '.join(missing)} (left blank).")
 
-    html = report.render(subject, comps, sc, months, rc, notes, blanks)
+    html = report.render(subject, comps, sc, months, rc, notes, blanks, seasonal=seasonal)
     out_dir.mkdir(parents=True, exist_ok=True)
     html_path = out_dir / f"{subject['output_name']}.html"
     html_path.write_text(html)
@@ -192,7 +235,11 @@ def main() -> int:
         "comp_median_revenue": sc["comp_median_revenue"], "market_model_revenue": sc["market_model_revenue"],
         "rate_card_total": rc["total"],
         "comps": [{"name": c.get("name"), "city": c.get("city"), "listing_id": c.get("listing_id"),
-                   "annual_revenue": c.get("revenue")} for c in comps],
+                   "bedrooms": c.get("bedrooms"), "guests": c.get("guests"), "larger": c.get("_larger"),
+                   "annual_revenue": c.get("revenue"), "occupancy": c.get("occupancy"), "adr": c.get("adr"),
+                   "nights_booked": c.get("nights_booked"), "days_available": c.get("days_available")}
+                  for c in comps],
+        "seasonal_occupancy": seasonal,
         "notes": notes + blanks + ([pdf_err] if pdf_err else []),
     }
     raw_dir.mkdir(parents=True, exist_ok=True)

@@ -2,71 +2,133 @@
   "html": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.html",
   "pdf": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.pdf",
   "conservative": {
-    "revenue": 89085.75,
-    "occupancy": 0.24775,
-    "adr": 985.1485285376609
+    "revenue": 69647.25,
+    "occupancy": 0.14925,
+    "adr": 1278.4883320713154
   },
   "base": {
-    "revenue": 94682.56009829135,
-    "occupancy": 0.314,
-    "adr": 826.1282619168602
+    "revenue": 88248.81009829135,
+    "occupancy": 0.16299999999999998,
+    "adr": 1483.297925847405
   },
   "optimistic": {
-    "revenue": 114134.02557373047,
-    "occupancy": 0.396,
-    "adr": 789.6362638282168
+    "revenue": 122060.75,
+    "occupancy": 0.20149999999999998,
+    "adr": 1659.617933988239
   },
-  "comp_median_revenue": 98373.0,
+  "comp_median_revenue": 85505.5,
   "market_model_revenue": 90992.12019658268,
   "rate_card_total": 228000,
   "comps": [
     {
-      "name": "New Construction, Walk to Town, Easy Lake access",
+      "name": "Lakefront Home Recently Built - Prime Spot",
       "city": "Wolfeboro",
-      "listing_id": 709247721434308799,
-      "annual_revenue": 87057.0
+      "listing_id": 1129755843361319531,
+      "bedrooms": 7,
+      "guests": 12,
+      "larger": true,
+      "annual_revenue": 179508.0,
+      "occupancy": 0.211,
+      "adr": 1707.1,
+      "nights_booked": 77,
+      "days_available": 365.0
     },
     {
-      "name": "Luxury Wolfeboro Retreat Near Lake Winnipesaukee",
-      "city": "Wolfeboro",
-      "listing_id": 960979712329912665,
-      "annual_revenue": 101589.0
+      "name": "Winnipesaukee-Mark Island - Unique Post & Beam",
+      "city": "Gilford",
+      "listing_id": 816027328540304872,
+      "bedrooms": 5,
+      "guests": 13,
+      "larger": true,
+      "annual_revenue": 82713.0,
+      "occupancy": 0.153,
+      "adr": 1360.5,
+      "nights_booked": 56,
+      "days_available": 173.0
     },
     {
-      "name": "Luxury Lakehouse| Sunsets| Cen. Air| Private Dock",
-      "city": "Wolfeboro",
-      "listing_id": 49534550,
-      "annual_revenue": 95172.0
+      "name": "Lakefront Home Near Wolfeboro-5BR, Sauna & Kayaks",
+      "city": "New Durham",
+      "listing_id": 1168919786502037648,
+      "bedrooms": 5,
+      "guests": 12,
+      "larger": true,
+      "annual_revenue": 65292.0,
+      "occupancy": 0.137,
+      "adr": 1244.6,
+      "nights_booked": 50,
+      "days_available": 365.0
     },
     {
-      "name": "Lakeside Getaway - Lake Access/PrivateDock/Firepit",
-      "city": "Wolfeboro",
-      "listing_id": 1399234440628875772,
-      "annual_revenue": 188635.0
+      "name": "Modern Lake House Getaway",
+      "city": "Alton",
+      "listing_id": 1110271078469655001,
+      "bedrooms": 5,
+      "guests": 12,
+      "larger": true,
+      "annual_revenue": 88298.0,
+      "occupancy": 0.173,
+      "adr": 1158.2,
+      "nights_booked": 63,
+      "days_available": 365.0
     },
     {
-      "name": "Gram's House",
-      "city": "Wolfeboro",
-      "listing_id": 984250669252369647,
-      "annual_revenue": 101574.0
+      "name": "The Irish Girl, Moltonborogh NH",
+      "city": "Moultonborough",
+      "listing_id": 28861338,
+      "bedrooms": 4,
+      "guests": 12,
+      "larger": false,
+      "annual_revenue": 133315.0,
+      "occupancy": 0.318,
+      "adr": 1038.3,
+      "nights_booked": 116,
+      "days_available": 176.0
     },
     {
-      "name": "Wolfeboro In-Town. Large Beautiful home.",
+      "name": "Lakefront Winnipesaukee Home",
       "city": "Wolfeboro",
-      "listing_id": 830476902214555302,
-      "annual_revenue": 19722.0
+      "listing_id": 27110534,
+      "bedrooms": 5,
+      "guests": 10,
+      "larger": true,
+      "annual_revenue": 58025.0,
+      "occupancy": 0.148,
+      "adr": 1007.3,
+      "nights_booked": 54,
+      "days_available": 162.0
     }
   ],
+  "seasonal_occupancy": {
+    "peak": 0.36538888888888893,
+    "shoulder": 0.011083333333333336,
+    "comps_used": 6,
+    "monthly_revenue": [
+      1141.0,
+      1123.0,
+      1309.0,
+      1259.0,
+      59024.0,
+      87630.0,
+      188326.0,
+      155193.0,
+      52596.0,
+      16123.0,
+      7310.0,
+      1263.0
+    ]
+  },
   "notes": [
-    "Live AirROI pull on 2026-09-23 01:18 UTC.",
+    "Live AirROI pull on 2026-09-23 01:37 UTC.",
     "Subject geocoded by US Census geocoder: 43.56842, -71.18622.",
-    "AirROI API calls made: 9.",
+    "AirROI radius search: 135 listings within 12 miles matching 4-7 BR, sleeps 7-13, waterfront, lake_access, boat_slip.",
+    "AirROI API calls made: 23.",
     "Report rebuilt from the saved responses of that pull (no new API calls).",
-    "New Construction, Walk to Town, Easy Lake access: AirROI did not return Revenue Potential (left blank).",
-    "Luxury Wolfeboro Retreat Near Lake Winnipesaukee: AirROI did not return Revenue Potential (left blank).",
-    "Luxury Lakehouse| Sunsets| Cen. Air| Private Dock: AirROI did not return Revenue Potential (left blank).",
-    "Lakeside Getaway - Lake Access/PrivateDock/Firepit: AirROI did not return Revenue Potential (left blank).",
-    "Gram's House: AirROI did not return Revenue Potential (left blank).",
-    "Wolfeboro In-Town. Large Beautiful home.: AirROI did not return Revenue Potential (left blank)."
+    "Lakefront Home Recently Built - Prime Spot: AirROI did not return Revenue Potential (left blank).",
+    "Winnipesaukee-Mark Island - Unique Post & Beam: AirROI did not return Revenue Potential (left blank).",
+    "Lakefront Home Near Wolfeboro-5BR, Sauna & Kayaks: AirROI did not return Revenue Potential (left blank).",
+    "Modern Lake House Getaway: AirROI did not return Revenue Potential (left blank).",
+    "The Irish Girl, Moltonborogh NH: AirROI did not return Revenue Potential (left blank).",
+    "Lakefront Winnipesaukee Home: AirROI did not return Revenue Potential (left blank)."
   ]
 }
