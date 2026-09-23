@@ -115,7 +115,8 @@ def comp_card(c: dict, subject_bedrooms=None) -> str:
     badges = "".join(f'<span class="badge">{e(pretty_amenity(a))}</span>' for a in amen)
     metrics = [("Revenue Potential", money_k(c.get("revenue_potential"))),
                ("Annual Revenue", money_k(c.get("revenue"))),
-               ("Occupancy", pct(c.get("occupancy"))),
+               ("Occupancy (full year)", pct(c.get("occupancy"))),
+               ("Occupancy (open nights)", pct(c.get("adjusted_occupancy"))),
                ("ADR", money(c.get("adr"))),
                ("Days Available", num(c.get("days_available"))),
                ("Nights Booked", num(c.get("nights_booked")))]
@@ -160,6 +161,27 @@ def seasonal_block(seasonal: dict | None) -> str:
   </div>
   <p class="muted small" style="margin-top:10px">Average of AirROI's monthly occupancy for {seasonal.get('comps_used')} comparable listings over the last 12 months.</p>
 </section>"""
+
+
+def occupancy_note(comps: list[dict], sc: dict, market_occ: dict | None) -> str:
+    """Explain full-year vs open-night occupancy and the rate/occupancy tradeoff, from AirROI values only."""
+    adj = [c["adjusted_occupancy"] for c in comps if c.get("adjusted_occupancy") is not None]
+    parts = ["<strong>Why occupancy reads low:</strong> AirROI occupancy is nights booked divided by all 365 days "
+             "of the year. Several of these homes are only open to guests part of the year"]
+    if adj:
+        parts.append(f"; measured against the nights they were open, the comps booked {pct(min(adj))} to "
+                     f"{pct(max(adj))}")
+    parts.append(".")
+    if market_occ:
+        parts.append(
+            f" In AirROI's data for this area, higher nightly rates come with lower occupancy: "
+            f"{market_occ['n_hi_occ']} of the {market_occ['pool']} active lake homes in the search (4-7 bedrooms, sleeps 7-13, 30+ nights booked) booked 40% or more of the year, "
+            f"and all of them averaged {money(market_occ['max_adr_hi_occ'])} a night or less. "
+            f"None of the homes at $1,000+ a night booked more than {pct(market_occ['max_occ_1000'])} of the year. "
+            f"AirROI's location estimate for a typical {market_occ['beds']}-bedroom home here is "
+            f"{pct(market_occ['est_occ'])} occupancy at {money(market_occ['est_adr'])} a night, about the same "
+            f"annual revenue reached a different way.")
+    return f'<div class="derive" style="margin-top:16px">{"".join(parts)}</div>'
 
 
 def larger_note(comps: list[dict], subject: dict) -> str:
@@ -242,7 +264,7 @@ def derivation_text(sc: dict, rc: dict, subject: dict, n: int, comp_pattern: boo
 
 def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | None, rc: dict,
            notes: list[str], blanks: list[str], generated: dt.date | None = None,
-           seasonal: dict | None = None) -> str:
+           seasonal: dict | None = None, market_occ: dict | None = None) -> str:
     generated = generated or dt.date.today()
     n = len(comps)
     cons, base, opt = sc["conservative"], sc["base"], sc["optimistic"]
@@ -400,6 +422,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
     <div class="tier"><div class="lbl">Optimistic</div><div class="val">{money(opt and opt['revenue'])}</div><div class="sub">{tier_sub(opt)}</div></div>
   </div>
   <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of {n} comparable properties. AirROI measures occupancy over the full {days}-day year{'' if sc['days_from_comps'] else ' (AirROI did not return total days, so 365 is used)'}.</p>
+  {occupancy_note(comps, sc, market_occ)}
   <div class="derive"><strong>How the base case is derived:</strong> {derivation_text(sc, rc, subject, n, comp_pattern)}</div>
 
   <h3>Interactive Performance Model</h3>
@@ -408,7 +431,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
       <div class="row"><input type="range" id="occ" min="5" max="90" step="0.1" value="{base_occ:g}"><div class="out"><span id="occV">{base_occ:g}</span>%</div></div>
       <div class="muted small">Comp range: {pct(occ_rng[0]) if occ_rng else ''}{' &ndash; ' + pct(occ_rng[1]) if occ_rng else ''}</div></div>
     <div class="slider"><label for="adr">Average Daily Rate</label>
-      <div class="row"><input type="range" id="adr" min="{adr_min}" max="{adr_max}" step="5" value="{base_adr}"><div class="out">$<span id="adrV">{base_adr:,}</span></div></div>
+      <div class="row"><input type="range" id="adr" min="{adr_min}" max="{adr_max}" step="1" value="{base_adr}"><div class="out">$<span id="adrV">{base_adr:,}</span></div></div>
       <div class="muted small">Comp range: {money(adr_rng[0]) if adr_rng else ''}{' &ndash; ' + money(adr_rng[1]) if adr_rng else ''}</div></div>
     <div class="slider"><label for="days">Days Available</label>
       <div class="row"><input type="range" id="days" min="60" max="365" step="1" value="{days}"><div class="out"><span id="daysV">{days}</span></div></div>
@@ -479,7 +502,8 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
     $('adrS').textContent = a.toLocaleString(); $('kAvail').textContent = d; $('kBooked').textContent = booked;
     $('kAdr').textContent = '$' + a.toLocaleString(); $('kRevpar').textContent = '$' + Math.round(rev / d).toLocaleString();
   }}
-  ['occ', 'adr', 'days'].forEach(function (id) {{ $(id).addEventListener('input', upd); }});
+  ['occ', 'adr', 'days'].forEach(function (id) {{ $(id).addEventListener('input', upd); $(id).addEventListener('change', upd); }});
+  upd();
 }})();
 </script>
 </body>

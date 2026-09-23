@@ -51,6 +51,8 @@ FIELD_MAP: dict[str, list[str]] = {
     "revenue_potential": ["performance_metrics.ttm_revenue_potential",
                           "performance_metrics.ttm_potential_revenue"],
     "occupancy": ["performance_metrics.ttm_occupancy"],
+    # booked nights / nights open to guests (AirROI excludes blocked nights here)
+    "adjusted_occupancy": ["performance_metrics.ttm_adjusted_occupancy"],
     "adr": ["performance_metrics.ttm_avg_rate", "performance_metrics.ttm_adr"],
     # Days Available = ttm_total_days - ttm_blocked_days (nights open to guests, booked or not).
     # AirROI's ttm_available_days is only the open nights that went unbooked.
@@ -87,7 +89,7 @@ def field(listing: dict, name: str) -> Any:
         if val not in (None, "", []):
             if name == "photo" and isinstance(val, dict):
                 val = val.get("url") or val.get("large") or val.get("original")
-            if name == "occupancy":
+            if name in ("occupancy", "adjusted_occupancy"):
                 val = normalize_occupancy(val)
             return val
     return None

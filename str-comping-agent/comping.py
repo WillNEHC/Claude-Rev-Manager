@@ -161,6 +161,19 @@ def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     }
 
 
+def rate_occupancy_tradeoff(pool: list[dict], estimate: dict | None, beds, min_booked: int = 0) -> dict | None:
+    """Plain facts from the whole candidate pool: who reaches 40%+ occupancy, at what nightly rates."""
+    act = [c for c in pool if c.get("occupancy") is not None and c.get("adr")
+           and (c.get("nights_booked") or 0) >= min_booked and (c.get("revenue") or 0) > 0]
+    hi = [c for c in act if float(c["occupancy"]) >= 0.40]
+    top = [c for c in act if float(c["adr"]) >= 1000]
+    if not hi or not top:
+        return None
+    return {"pool": len(act), "n_hi_occ": len(hi), "max_adr_hi_occ": max(float(c["adr"]) for c in hi),
+            "max_occ_1000": max(float(c["occupancy"]) for c in top), "beds": beds,
+            "est_occ": (estimate or {}).get("occupancy"), "est_adr": (estimate or {}).get("average_daily_rate")}
+
+
 PEAK_MONTHS = (5, 6, 7, 8, 9, 10)  # May-Oct, as in the reference reports; Nov-Apr is shoulder
 
 

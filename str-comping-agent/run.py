@@ -223,7 +223,15 @@ def main() -> int:
         if missing:
             blanks.append(f"{c.get('name')}: AirROI did not return {', '.join(missing)} (left blank).")
 
-    html = report.render(subject, comps, sc, months, rc, notes, blanks, seasonal=seasonal)
+    rs = subject["criteria"].get("radius_search")
+    crit = subject["criteria"]
+    pool = [c for c in flat if (not rs or comping.has_water_amenity(c))
+            and c.get("bedrooms") is not None and crit["bedrooms"][0] <= float(c["bedrooms"]) <= crit["bedrooms"][1]
+            and c.get("guests") is not None and crit["guests"][0] <= float(c["guests"]) <= crit["guests"][1]]
+    uniq = {c.get("listing_id"): c for c in pool}.values()
+    tradeoff = comping.rate_occupancy_tradeoff(list(uniq), estimate, subject["bedrooms"],
+                                               subject["criteria"].get("min_nights_booked", 0))
+    html = report.render(subject, comps, sc, months, rc, notes, blanks, seasonal=seasonal, market_occ=tradeoff)
     out_dir.mkdir(parents=True, exist_ok=True)
     html_path = out_dir / f"{subject['output_name']}.html"
     html_path.write_text(html)
