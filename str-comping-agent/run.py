@@ -16,6 +16,7 @@ import os
 import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -85,12 +86,19 @@ def pull(subject: dict, raw_dir: Path) -> tuple[list[dict], dict | None, tuple, 
             except airroi.AirROIError as ex:
                 notes.append(f"AirROI comparables ({town}, {b} BR) failed: {ex}")
     notes.append(f"AirROI API calls made: {client.calls}.")
+    pulled = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    notes.insert(0, f"Live AirROI pull on {pulled}.")
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    (raw_dir / "pull.json").write_text(json.dumps({"pulled_at": pulled, "lat": lat, "lng": lng,
+                                                   "notes": notes}, indent=2))
     return candidates, estimate, (lat, lng), notes
 
 
 def load_raw(raw_dir: Path) -> tuple[list[dict], dict | None]:
     estimate, candidates = None, []
     for f in sorted(raw_dir.glob("*.json")):
+        if f.stem in ("summary", "pull"):
+            continue
         data = json.loads(f.read_text()).get("response")
         if f.stem == "estimate":
             estimate = data
@@ -139,8 +147,12 @@ def main() -> int:
 
     if args.from_raw:
         candidates, estimate = load_raw(raw_dir)
-        lat, lng = subject.get("lat"), subject.get("lng")
-        notes = [f"Rebuilt from saved AirROI responses in {raw_dir}."]
+        pull_file = raw_dir / "pull.json"
+        pull_info = json.loads(pull_file.read_text()) if pull_file.exists() else {}
+        lat = subject.get("lat") if subject.get("lat") is not None else pull_info.get("lat")
+        lng = subject.get("lng") if subject.get("lng") is not None else pull_info.get("lng")
+        notes = list(pull_info.get("notes", []))
+        notes.append("Report rebuilt from the saved responses of that pull (no new API calls).")
     else:
         candidates, estimate, (lat, lng), notes = pull(subject, raw_dir)
 

@@ -58,7 +58,10 @@
     }
   ],
   "notes": [
-    "Rebuilt from saved AirROI responses in output/data/81-timberlane-wolfeboro.",
+    "Live AirROI pull on 2026-09-23 01:18 UTC.",
+    "Subject geocoded by US Census geocoder: 43.56842, -71.18622.",
+    "AirROI API calls made: 9.",
+    "Report rebuilt from the saved responses of that pull (no new API calls).",
     "New Construction, Walk to Town, Easy Lake access: AirROI did not return Revenue Potential (left blank).",
     "Luxury Wolfeboro Retreat Near Lake Winnipesaukee: AirROI did not return Revenue Potential (left blank).",
     "Luxury Lakehouse| Sunsets| Cen. Air| Private Dock: AirROI did not return Revenue Potential (left blank).",
