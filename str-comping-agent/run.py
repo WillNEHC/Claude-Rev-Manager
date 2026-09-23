@@ -26,6 +26,25 @@ import comping  # noqa: E402
 import report  # noqa: E402
 
 REPO = HERE.parent
+
+
+def load_dotenv() -> None:
+    """Load KEY=VALUE lines from .env.local / .env at the repo root (real env vars win)."""
+    for name in (".env.local", ".env"):
+        path = REPO / name
+        if not path.exists():
+            continue
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            val = val.strip().strip('"').strip("'")
+            if val and key.strip() not in os.environ:
+                os.environ[key.strip()] = val
+
+
+load_dotenv()
 CARD_FIELDS = {"photo": "photo", "guests": "sleeps", "bedrooms": "bedrooms", "baths": "baths",
                "rating": "rating", "reviews": "review count", "amenities": "amenities",
                "revenue_potential": "Revenue Potential", "revenue": "Annual Revenue",

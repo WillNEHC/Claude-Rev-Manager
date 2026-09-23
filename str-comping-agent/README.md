@@ -7,7 +7,7 @@ Pulls comparable listings from AirROI and builds a self-contained
 
 ```bash
 pip install requests
-export AIRROI_API_KEY=your_key            # from airroi.com/api/developer
+# put AIRROI_API_KEY=your_key in .env (or .env.local) at the repo root -- see .env.example
 python3 str-comping-agent/run.py str-comping-agent/subjects/81-timberlane-wolfeboro.json
 ```
 
