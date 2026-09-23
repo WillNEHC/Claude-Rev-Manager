@@ -198,7 +198,11 @@ def main() -> int:
         print("No comps with AirROI revenue matched the criteria. Nothing rendered.\n  "
               + "\n  ".join(notes), file=sys.stderr)
         return 2
-    seasonal = comping.seasonal_occupancy(fetch_metrics(client, comps, raw_dir, notes))
+    season_months = subject.get("rate_card", {}).get("season_months")
+    metrics = fetch_metrics(client, comps, raw_dir, notes)
+    seasonal = comping.seasonal_occupancy(metrics, season_months)
+    for c in comps:
+        c["_season_occ"] = comping.season_occupancy(metrics.get(c.get("listing_id")), season_months or [])
     if client is not None:
         pulled = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         pull_notes = [f"Live AirROI pull on {pulled}."] + pull_notes + [f"AirROI API calls made: {client.calls}."]
@@ -244,7 +248,9 @@ def main() -> int:
         "rate_card_total": rc["total"],
         "comps": [{"name": c.get("name"), "city": c.get("city"), "listing_id": c.get("listing_id"),
                    "bedrooms": c.get("bedrooms"), "guests": c.get("guests"), "larger": c.get("_larger"),
-                   "annual_revenue": c.get("revenue"), "occupancy": c.get("occupancy"), "adr": c.get("adr"),
+                   "annual_revenue": c.get("revenue"), "occupancy_open_nights": c.get("adjusted_occupancy"),
+                   "occupancy_full_year": c.get("occupancy"), "season_occupancy": c.get("_season_occ"),
+                   "adr": c.get("adr"),
                    "nights_booked": c.get("nights_booked"), "days_available": c.get("days_available")}
                   for c in comps],
         "seasonal_occupancy": seasonal,

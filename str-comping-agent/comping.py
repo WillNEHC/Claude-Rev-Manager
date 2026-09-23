@@ -118,10 +118,11 @@ def pct(values: list[float], p: float) -> float | None:
 
 def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     revs = [float(c["revenue"]) for c in comps if c.get("revenue") is not None]
-    occs = [float(c["occupancy"]) for c in comps if c.get("occupancy") is not None]
-    # AirROI occupancy = nights booked / ttm_total_days (the full year, blocked nights included),
-    # so revenue / (occupancy x total days) recovers revenue per booked night.
-    days = [float(c["total_days"]) for c in comps if c.get("total_days") is not None]
+    # Open-night basis: AirROI ttm_adjusted_occupancy = nights booked / nights open to guests
+    # (total days minus blocked days), and days_available = those open nights. So
+    # revenue / (occupancy x open nights) recovers revenue per booked night.
+    occs = [float(c["adjusted_occupancy"]) for c in comps if c.get("adjusted_occupancy") is not None]
+    days = [float(c["days_available"]) for c in comps if c.get("days_available") is not None]
     adrs = [float(c["adr"]) for c in comps if c.get("adr") is not None]
 
     comp_median = median(revs) if revs else None
@@ -163,21 +164,30 @@ def scenarios(comps: list[dict], estimate: dict | None) -> dict:
 
 def rate_occupancy_tradeoff(pool: list[dict], estimate: dict | None, beds, min_booked: int = 0) -> dict | None:
     """Plain facts from the whole candidate pool: who reaches 40%+ occupancy, at what nightly rates."""
-    act = [c for c in pool if c.get("occupancy") is not None and c.get("adr")
+    act = [c for c in pool if c.get("adjusted_occupancy") is not None and c.get("adr")
            and (c.get("nights_booked") or 0) >= min_booked and (c.get("revenue") or 0) > 0]
-    hi = [c for c in act if float(c["occupancy"]) >= 0.40]
-    top = [c for c in act if float(c["adr"]) >= 1000]
-    if not hi or not top:
+    hi = [c for c in act if float(c["adjusted_occupancy"]) >= 0.40]
+    if not act:
         return None
-    return {"pool": len(act), "n_hi_occ": len(hi), "max_adr_hi_occ": max(float(c["adr"]) for c in hi),
-            "max_occ_1000": max(float(c["occupancy"]) for c in top), "beds": beds,
+    return {"pool": len(act), "n_hi_occ": len(hi),
+            "n_hi_occ_1000": sum(1 for c in hi if float(c["adr"]) >= 1000), "beds": beds,
             "est_occ": (estimate or {}).get("occupancy"), "est_adr": (estimate or {}).get("average_daily_rate")}
 
 
 PEAK_MONTHS = (5, 6, 7, 8, 9, 10)  # May-Oct, as in the reference reports; Nov-Apr is shoulder
 
 
-def seasonal_occupancy(metrics_by_comp: dict) -> dict | None:
+def season_occupancy(rows: list[dict] | None, months) -> float | None:
+    """Average of AirROI monthly occupancy over the given calendar months (1-12)."""
+    vals = []
+    for r in rows or []:
+        date, occ = str(r.get("date") or ""), r.get("occupancy")
+        if occ is not None and len(date) >= 7 and int(date[5:7]) in months:
+            vals.append(float(occ) / 100 if float(occ) > 1 else float(occ))
+    return sum(vals) / len(vals) if vals else None
+
+
+def seasonal_occupancy(metrics_by_comp: dict, season_months=None) -> dict | None:
     """Average monthly occupancy across the comp set, peak (May-Oct) vs shoulder (Nov-Apr).
 
     metrics_by_comp: {listing_id: [ {date: 'YYYY-MM', occupancy: 0-1, ...}, ... ]} from
@@ -199,7 +209,13 @@ def seasonal_occupancy(metrics_by_comp: dict) -> dict | None:
         used += got
     if not peak and not shoulder:
         return None
-    return {"peak": sum(peak) / len(peak) if peak else None,
+    season = None
+    if season_months:
+        per = [season_occupancy(rows, season_months) for rows in metrics_by_comp.values()]
+        per = [v for v in per if v is not None]
+        season = sum(per) / len(per) if per else None
+    return {"season": season, "season_months": list(season_months or []),
+            "peak": sum(peak) / len(peak) if peak else None,
             "shoulder": sum(shoulder) / len(shoulder) if shoulder else None,
             "comps_used": used,
             # combined AirROI monthly revenue of the comp set, Jan..Dec

@@ -3,18 +3,18 @@
   "pdf": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.pdf",
   "conservative": {
     "revenue": 69647.25,
-    "occupancy": 0.14925,
-    "adr": 1278.4883320713154
+    "occupancy": 0.1825,
+    "adr": 1413.4398782343987
   },
   "base": {
     "revenue": 88248.81009829135,
-    "occupancy": 0.16299999999999998,
-    "adr": 1483.297925847405
+    "occupancy": 0.2675,
+    "adr": 1221.859606760697
   },
   "optimistic": {
     "revenue": 122060.75,
-    "occupancy": 0.20149999999999998,
-    "adr": 1659.617933988239
+    "occupancy": 0.33075,
+    "adr": 1366.8234371938076
   },
   "comp_median_revenue": 85505.5,
   "market_model_revenue": 90992.12019658268,
@@ -28,7 +28,9 @@
       "guests": 12,
       "larger": true,
       "annual_revenue": 179508.0,
-      "occupancy": 0.211,
+      "occupancy_open_nights": 0.211,
+      "occupancy_full_year": 0.211,
+      "season_occupancy": 0.504,
       "adr": 1707.1,
       "nights_booked": 77,
       "days_available": 365.0
@@ -41,7 +43,9 @@
       "guests": 13,
       "larger": true,
       "annual_revenue": 82713.0,
-      "occupancy": 0.153,
+      "occupancy_open_nights": 0.324,
+      "occupancy_full_year": 0.153,
+      "season_occupancy": 0.43825000000000003,
       "adr": 1360.5,
       "nights_booked": 56,
       "days_available": 173.0
@@ -54,7 +58,9 @@
       "guests": 12,
       "larger": true,
       "annual_revenue": 65292.0,
-      "occupancy": 0.137,
+      "occupancy_open_nights": 0.137,
+      "occupancy_full_year": 0.137,
+      "season_occupancy": 0.2925,
       "adr": 1244.6,
       "nights_booked": 50,
       "days_available": 365.0
@@ -67,7 +73,9 @@
       "guests": 12,
       "larger": true,
       "annual_revenue": 88298.0,
-      "occupancy": 0.173,
+      "occupancy_open_nights": 0.173,
+      "occupancy_full_year": 0.173,
+      "season_occupancy": 0.51075,
       "adr": 1158.2,
       "nights_booked": 63,
       "days_available": 365.0
@@ -80,7 +88,9 @@
       "guests": 12,
       "larger": false,
       "annual_revenue": 133315.0,
-      "occupancy": 0.318,
+      "occupancy_open_nights": 0.659,
+      "occupancy_full_year": 0.318,
+      "season_occupancy": 0.8262499999999999,
       "adr": 1038.3,
       "nights_booked": 116,
       "days_available": 176.0
@@ -93,13 +103,22 @@
       "guests": 10,
       "larger": true,
       "annual_revenue": 58025.0,
-      "occupancy": 0.148,
+      "occupancy_open_nights": 0.333,
+      "occupancy_full_year": 0.148,
+      "season_occupancy": 0.241,
       "adr": 1007.3,
       "nights_booked": 54,
       "days_available": 162.0
     }
   ],
   "seasonal_occupancy": {
+    "season": 0.46879166666666666,
+    "season_months": [
+      6,
+      7,
+      8,
+      9
+    ],
     "peak": 0.36538888888888893,
     "shoulder": 0.011083333333333336,
     "comps_used": 6,

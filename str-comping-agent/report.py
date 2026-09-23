@@ -98,7 +98,11 @@ def monthly_svg(values: list[float] | None, highlight: set[int]) -> str:
 
 # ---------- sections ----------
 
-def comp_card(c: dict, subject_bedrooms=None) -> str:
+def season_label(months) -> str:
+    return f"{MONTHS[months[0] - 1]}&ndash;{MONTHS[months[-1] - 1]}" if months else ""
+
+
+def comp_card(c: dict, subject_bedrooms=None, season_months=None) -> str:
     specs = " / ".join(x for x in [
         f"Sleeps {num(c['guests'])}" if c.get("guests") is not None else "",
         f"{num(c['bedrooms'])} BR" if c.get("bedrooms") is not None else "",
@@ -115,8 +119,8 @@ def comp_card(c: dict, subject_bedrooms=None) -> str:
     badges = "".join(f'<span class="badge">{e(pretty_amenity(a))}</span>' for a in amen)
     metrics = [("Revenue Potential", money_k(c.get("revenue_potential"))),
                ("Annual Revenue", money_k(c.get("revenue"))),
-               ("Occupancy (full year)", pct(c.get("occupancy"))),
                ("Occupancy (open nights)", pct(c.get("adjusted_occupancy"))),
+               (f"Summer occupancy ({season_label(season_months)})", pct(c.get("_season_occ"))),
                ("ADR", money(c.get("adr"))),
                ("Days Available", num(c.get("days_available"))),
                ("Nights Booked", num(c.get("nights_booked")))]
@@ -145,6 +149,12 @@ def comp_card(c: dict, subject_bedrooms=None) -> str:
 def seasonal_block(seasonal: dict | None) -> str:
     if not seasonal or (seasonal.get("peak") is None and seasonal.get("shoulder") is None):
         return ""
+    summer_line = ""
+    if seasonal.get("season") is not None:
+        months = seasonal.get("season_months") or []
+        summer_line = (f'<div class="info" style="margin-bottom:18px"><b class="t">Summer rate-card season '
+                       f'({season_label(months)})</b>The comps averaged <strong>{pct(seasonal["season"])} occupancy</strong> '
+                       f'in these months, the same months the subject is rented today.</div>')
     sh = seasonal.get("shoulder")
     shoulder_line = ("Most of these homes took few or no Airbnb bookings in these months, so revenue is concentrated "
                      "in summer." if sh is not None and sh < 0.05 else
@@ -153,6 +163,7 @@ def seasonal_block(seasonal: dict | None) -> str:
 <section class="avoid-break">
   <div class="eyebrow">Performance Analytics</div>
   <h2>Seasonal Performance Patterns</h2>
+  {summer_line}
   <div class="grid2">
     <div class="info"><b class="t">Peak season (May&ndash;Oct)</b>
       These months average <strong>{pct(seasonal.get('peak'))} occupancy</strong> across the comp set. This is the strongest demand window and carries the highest nightly rates of the year.</div>
@@ -163,24 +174,27 @@ def seasonal_block(seasonal: dict | None) -> str:
 </section>"""
 
 
-def occupancy_note(comps: list[dict], sc: dict, market_occ: dict | None) -> str:
-    """Explain full-year vs open-night occupancy and the rate/occupancy tradeoff, from AirROI values only."""
+def occupancy_note(comps: list[dict], sc: dict, market_occ: dict | None, seasonal: dict | None = None,
+                   season_months=None) -> str:
+    """Explain the open-night occupancy basis and the summer numbers, from AirROI values only."""
     adj = [c["adjusted_occupancy"] for c in comps if c.get("adjusted_occupancy") is not None]
-    parts = ["<strong>Why occupancy reads low:</strong> AirROI occupancy is nights booked divided by all 365 days "
-             "of the year. Several of these homes are only open to guests part of the year"]
+    parts = ["<strong>How occupancy is measured:</strong> the annual occupancy figures in this report are on open "
+             "nights: nights booked divided by the nights the home was open to guests (AirROI excludes nights the "
+             "owner blocked). Monthly and seasonal figures are AirROI's monthly occupancy."]
     if adj:
-        parts.append(f"; measured against the nights they were open, the comps booked {pct(min(adj))} to "
-                     f"{pct(max(adj))}")
-    parts.append(".")
+        parts.append(f" On that basis the comps booked {pct(min(adj))} to {pct(max(adj))} of their open nights "
+                     f"over the last 12 months.")
+    if seasonal and seasonal.get("season") is not None:
+        parts.append(f" In the summer rate-card season ({season_label(season_months)}) they averaged "
+                     f"<strong>{pct(seasonal['season'])}</strong>. Most of their bookings fall in summer, and several "
+                     f"took few or no bookings from November to April, which pulls the 12-month figure down.")
     if market_occ:
         parts.append(
             f" In AirROI's data for this area, higher nightly rates come with lower occupancy: "
-            f"{market_occ['n_hi_occ']} of the {market_occ['pool']} active lake homes in the search (4-7 bedrooms, sleeps 7-13, 30+ nights booked) booked 40% or more of the year, "
-            f"and all of them averaged {money(market_occ['max_adr_hi_occ'])} a night or less. "
-            f"None of the homes at $1,000+ a night booked more than {pct(market_occ['max_occ_1000'])} of the year. "
+            f"{market_occ['n_hi_occ']} of the {market_occ['pool']} active lake homes in the search booked 40% or more "
+            f"of their open nights, and {market_occ['n_hi_occ_1000']} of those averaged $1,000+ a night. "
             f"AirROI's location estimate for a typical {market_occ['beds']}-bedroom home here is "
-            f"{pct(market_occ['est_occ'])} occupancy at {money(market_occ['est_adr'])} a night, about the same "
-            f"annual revenue reached a different way.")
+            f"{pct(market_occ['est_occ'])} occupancy at {money(market_occ['est_adr'])} a night.")
     return f'<div class="derive" style="margin-top:16px">{"".join(parts)}</div>'
 
 
@@ -278,7 +292,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
     adrs = [c["adr"] for c in comps if c.get("adr") is not None]
     adr_min = int(max(50, (min(adrs) if adrs else 200) * 0.5) // 25 * 25)
     adr_max = int(((max(adrs) if adrs else 1500) * 1.3) // 25 * 25 + 25)
-    base_occ = round((base.get("occupancy") or 0.45) * 1000) / 10  # 0.1-point slider steps
+    base_occ = round((base.get("occupancy") or 0.45) * 10000) / 100  # 0.01-point slider steps
     comp_pattern = bool(seasonal and seasonal.get("monthly_revenue"))
     base_adr = round(base.get("adr") or (adr_min + adr_max) / 2)
     base_adr = min(max(base_adr, adr_min), adr_max)
@@ -421,14 +435,14 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
     <div class="tier base"><div class="lbl">Base Case</div><div class="val">{money(base['revenue'])}</div><div class="sub">{tier_sub(base)}</div></div>
     <div class="tier"><div class="lbl">Optimistic</div><div class="val">{money(opt and opt['revenue'])}</div><div class="sub">{tier_sub(opt)}</div></div>
   </div>
-  <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of {n} comparable properties. AirROI measures occupancy over the full {days}-day year{'' if sc['days_from_comps'] else ' (AirROI did not return total days, so 365 is used)'}.</p>
-  {occupancy_note(comps, sc, market_occ)}
+  <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of {n} comparable properties. Occupancy is measured on open nights (nights booked &divide; nights open to guests); the comps' median is {days} open nights a year{'' if sc['days_from_comps'] else ' (AirROI did not return open nights, so 365 is used)'}.</p>
+  {occupancy_note(comps, sc, market_occ, seasonal, subject['rate_card'].get('season_months'))}
   <div class="derive"><strong>How the base case is derived:</strong> {derivation_text(sc, rc, subject, n, comp_pattern)}</div>
 
   <h3>Interactive Performance Model</h3>
   <div class="sliders">
-    <div class="slider"><label for="occ">Annual Occupancy</label>
-      <div class="row"><input type="range" id="occ" min="5" max="90" step="0.1" value="{base_occ:g}"><div class="out"><span id="occV">{base_occ:g}</span>%</div></div>
+    <div class="slider"><label for="occ">Occupancy (open nights)</label>
+      <div class="row"><input type="range" id="occ" min="5" max="100" step="0.01" value="{base_occ:g}"><div class="out"><span id="occV">{base_occ:g}</span>%</div></div>
       <div class="muted small">Comp range: {pct(occ_rng[0]) if occ_rng else ''}{' &ndash; ' + pct(occ_rng[1]) if occ_rng else ''}</div></div>
     <div class="slider"><label for="adr">Average Daily Rate</label>
       <div class="row"><input type="range" id="adr" min="{adr_min}" max="{adr_max}" step="1" value="{base_adr}"><div class="out">$<span id="adrV">{base_adr:,}</span></div></div>
@@ -465,7 +479,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
   <h2>Comparable Properties: AirROI Performance</h2>
   <p class="small" style="margin-bottom:16px">Trailing 12-month performance reported by AirROI. Blank fields were not returned by AirROI and have not been estimated.</p>
   {larger_note(comps, subject)}
-  <div class="comps">{''.join(comp_card(c, subject['bedrooms']) for c in comps)}</div>
+  <div class="comps">{''.join(comp_card(c, subject['bedrooms'], subject['rate_card'].get('season_months')) for c in comps)}</div>
 </section>
 
 <section class="method">
@@ -479,7 +493,8 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
       <li><b>Conservative:</b> 25th percentile of comp annual revenue</li>
       <li><b>Base:</b> average of the comp median and AirROI's location estimate</li>
       <li><b>Optimistic:</b> the highest of the comp 75th percentile, AirROI's 75th-percentile estimate and the base case</li>
-      <li>Occupancy shown is the matching comp percentile. AirROI measures occupancy over the full year, so ADR = revenue &divide; (occupancy &times; {days} nights)</li></ul></div>
+      <li>Occupancy is on open nights: AirROI nights booked &divide; nights open to guests (total days minus blocked days). Each scenario uses the matching comp percentile</li>
+      <li>ADR = revenue &divide; (occupancy &times; {days} open nights, the comp median)</li></ul></div>
     <div class="info"><b class="t">Data sources</b><ul>
       <li><b>AirROI</b> {e(endpoints_used(subject['criteria']))}: comp revenue, occupancy, ADR, availability, monthly performance and AirROI's location estimate</li>
       <li><b>Published rate card:</b> {e(subject['rate_card']['source'])}</li>

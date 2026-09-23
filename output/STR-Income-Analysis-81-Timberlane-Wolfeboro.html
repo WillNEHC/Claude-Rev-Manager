@@ -123,37 +123,37 @@
   <div class="eyebrow">Revenue Projections</div>
   <h2>Comp-Based Annual Revenue Projection</h2>
   <div class="tiers">
-    <div class="tier"><div class="lbl">Conservative</div><div class="val">$69,647</div><div class="sub">14.9% occ &middot; $1,278 ADR</div></div>
-    <div class="tier base"><div class="lbl">Base Case</div><div class="val">$88,249</div><div class="sub">16.3% occ &middot; $1,483 ADR</div></div>
-    <div class="tier"><div class="lbl">Optimistic</div><div class="val">$122,061</div><div class="sub">20.1% occ &middot; $1,660 ADR</div></div>
+    <div class="tier"><div class="lbl">Conservative</div><div class="val">$69,647</div><div class="sub">18.2% occ &middot; $1,413 ADR</div></div>
+    <div class="tier base"><div class="lbl">Base Case</div><div class="val">$88,249</div><div class="sub">26.8% occ &middot; $1,222 ADR</div></div>
+    <div class="tier"><div class="lbl">Optimistic</div><div class="val">$122,061</div><div class="sub">33.1% occ &middot; $1,367 ADR</div></div>
   </div>
-  <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of 6 comparable properties. AirROI measures occupancy over the full 365-day year.</p>
-  <div class="derive" style="margin-top:16px"><strong>Why occupancy reads low:</strong> AirROI occupancy is nights booked divided by all 365 days of the year. Several of these homes are only open to guests part of the year; measured against the nights they were open, the comps booked 14% to 66%. In AirROI's data for this area, higher nightly rates come with lower occupancy: 15 of the 67 active lake homes in the search (4-7 bedrooms, sleeps 7-13, 30+ nights booked) booked 40% or more of the year, and all of them averaged $780 a night or less. None of the homes at $1,000+ a night booked more than 32% of the year. AirROI's location estimate for a typical 4-bedroom home here is 43% occupancy at $585 a night, about the same annual revenue reached a different way.</div>
-  <div class="derive"><strong>How the base case is derived:</strong> We combine two independent AirROI methods: the median trailing-12-month revenue of the 6 comparable listings ($85,506) and AirROI's revenue estimate for a 4-bedroom, 4.5-bath, 10-guest home at this location ($90,992). The base case is the average of the two: <strong>$88,249</strong>. The two methods are 6.0% apart.<br><br><strong>Compared with the current summer rate card:</strong> 81 Timberlane's published 16-week summer schedule totals <strong>$228,000</strong> if every week sells. That works out to $2,036 per night across 112 nights. The rate card is $139,751 above the full-year comp-based base case. Based on the comp set's monthly AirROI revenue, 85% of annual revenue falls in Jun&ndash;Sep, about $74,594 of the base case. The rate card's nightly equivalent is 1.4x the base-case ADR ($1,483). Why the two differ: the rate card is an asking price that assumes 100% of summer weeks sell. The comps are what Airbnb listings actually earned over the last 12 months, including their unbooked nights. Weekly agency rentals like this one are not in AirROI's Airbnb data, so the comps may not reflect this property's own booking history. Use the rate card as the summer ceiling and the comp-based numbers as the year-round, nightly-rental view.</div>
+  <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of 6 comparable properties. Occupancy is measured on open nights (nights booked &divide; nights open to guests); the comps' median is 270 open nights a year.</p>
+  <div class="derive" style="margin-top:16px"><strong>How occupancy is measured:</strong> the annual occupancy figures in this report are on open nights: nights booked divided by the nights the home was open to guests (AirROI excludes nights the owner blocked). Monthly and seasonal figures are AirROI's monthly occupancy. On that basis the comps booked 14% to 66% of their open nights over the last 12 months. In the summer rate-card season (Jun&ndash;Sep) they averaged <strong>47%</strong>. Most of their bookings fall in summer, and several took few or no bookings from November to April, which pulls the 12-month figure down. In AirROI's data for this area, higher nightly rates come with lower occupancy: 22 of the 67 active lake homes in the search booked 40% or more of their open nights, and 1 of those averaged $1,000+ a night. AirROI's location estimate for a typical 4-bedroom home here is 43% occupancy at $585 a night.</div>
+  <div class="derive"><strong>How the base case is derived:</strong> We combine two independent AirROI methods: the median trailing-12-month revenue of the 6 comparable listings ($85,506) and AirROI's revenue estimate for a 4-bedroom, 4.5-bath, 10-guest home at this location ($90,992). The base case is the average of the two: <strong>$88,249</strong>. The two methods are 6.0% apart.<br><br><strong>Compared with the current summer rate card:</strong> 81 Timberlane's published 16-week summer schedule totals <strong>$228,000</strong> if every week sells. That works out to $2,036 per night across 112 nights. The rate card is $139,751 above the full-year comp-based base case. Based on the comp set's monthly AirROI revenue, 85% of annual revenue falls in Jun&ndash;Sep, about $74,594 of the base case. The rate card's nightly equivalent is 1.7x the base-case ADR ($1,222). Why the two differ: the rate card is an asking price that assumes 100% of summer weeks sell. The comps are what Airbnb listings actually earned over the last 12 months, including their unbooked nights. Weekly agency rentals like this one are not in AirROI's Airbnb data, so the comps may not reflect this property's own booking history. Use the rate card as the summer ceiling and the comp-based numbers as the year-round, nightly-rental view.</div>
 
   <h3>Interactive Performance Model</h3>
   <div class="sliders">
-    <div class="slider"><label for="occ">Annual Occupancy</label>
-      <div class="row"><input type="range" id="occ" min="5" max="90" step="0.1" value="16.3"><div class="out"><span id="occV">16.3</span>%</div></div>
-      <div class="muted small">Comp range: 14% &ndash; 32%</div></div>
+    <div class="slider"><label for="occ">Occupancy (open nights)</label>
+      <div class="row"><input type="range" id="occ" min="5" max="100" step="0.01" value="26.75"><div class="out"><span id="occV">26.75</span>%</div></div>
+      <div class="muted small">Comp range: 14% &ndash; 66%</div></div>
     <div class="slider"><label for="adr">Average Daily Rate</label>
-      <div class="row"><input type="range" id="adr" min="500" max="2225" step="1" value="1483"><div class="out">$<span id="adrV">1,483</span></div></div>
+      <div class="row"><input type="range" id="adr" min="500" max="2225" step="1" value="1222"><div class="out">$<span id="adrV">1,222</span></div></div>
       <div class="muted small">Comp range: $1,007 &ndash; $1,707</div></div>
     <div class="slider"><label for="days">Days Available</label>
-      <div class="row"><input type="range" id="days" min="60" max="365" step="1" value="365"><div class="out"><span id="daysV">365</span></div></div>
+      <div class="row"><input type="range" id="days" min="60" max="365" step="1" value="270"><div class="out"><span id="daysV">270</span></div></div>
       <div class="muted small">Nights open to guests per year, after owner use and maintenance</div></div>
   </div>
   <div class="projected">
     <div class="lbl">Projected Annual Gross Revenue</div>
-    <div class="val">$<span id="rev">88,231</span></div>
-    <div class="sub"><span id="occS">16.3</span>% occupancy of <span id="daysS">365</span> available nights at $<span id="adrS">1,483</span> ADR</div>
+    <div class="val">$<span id="rev">88,259</span></div>
+    <div class="sub"><span id="occS">26.75</span>% occupancy of <span id="daysS">270</span> available nights at $<span id="adrS">1,222</span> ADR</div>
     <div class="fine">Gross revenue before cleaning, platform fees, utilities, taxes, supplies and management.</div>
   </div>
   <div class="kpis">
-    <div class="metric"><div class="k">Available Nights</div><div class="v" id="kAvail">365</div></div>
-    <div class="metric"><div class="k">Booked Nights</div><div class="v" id="kBooked">59</div></div>
-    <div class="metric"><div class="k">ADR</div><div class="v" id="kAdr">$1,483</div></div>
-    <div class="metric"><div class="k">Revenue per Available Night</div><div class="v" id="kRevpar">$242</div></div>
+    <div class="metric"><div class="k">Available Nights</div><div class="v" id="kAvail">270</div></div>
+    <div class="metric"><div class="k">Booked Nights</div><div class="v" id="kBooked">72</div></div>
+    <div class="metric"><div class="k">ADR</div><div class="v" id="kAdr">$1,222</div></div>
+    <div class="metric"><div class="k">Revenue per Available Night</div><div class="v" id="kRevpar">$327</div></div>
   </div>
 </section>
 
@@ -169,6 +169,7 @@
 <section class="avoid-break">
   <div class="eyebrow">Performance Analytics</div>
   <h2>Seasonal Performance Patterns</h2>
+  <div class="info" style="margin-bottom:18px"><b class="t">Summer rate-card season (Jun&ndash;Sep)</b>The comps averaged <strong>47% occupancy</strong> in these months, the same months the subject is rented today.</div>
   <div class="grid2">
     <div class="info"><b class="t">Peak season (May&ndash;Oct)</b>
       These months average <strong>37% occupancy</strong> across the comp set. This is the strongest demand window and carries the highest nightly rates of the year.</div>
@@ -191,7 +192,7 @@
           <div class="muted small">Wolfeboro &middot; 0.6 mi from subject</div>
           <div class="specs">Sleeps 12 / 7 BR / 4 BA &middot; Rating 4.95 (20 reviews)</div>
           <div class="badges"><span class="badge">Hot water</span><span class="badge">Board games</span><span class="badge">Indoor fireplace</span><span class="badge">Fire extinguisher</span><span class="badge">Waterfront</span><span class="badge">Beach access</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$179.5K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">21%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">21%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,707</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">77</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$179.5K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">21%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">50%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,707</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">77</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/1129755843361319531">View listing</a>
       </article>
@@ -203,7 +204,7 @@
           <div class="muted small">Gilford &middot; 11.3 mi from subject</div>
           <div class="specs">Sleeps 13 / 5 BR / 2.5 BA &middot; Rating 5.00 (3 reviews)</div>
           <div class="badges"><span class="badge">Hot water</span><span class="badge">Board games</span><span class="badge">Indoor fireplace</span><span class="badge">Fire extinguisher</span><span class="badge">Hot water kettle</span><span class="badge">Waterfront</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$82.7K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">15%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">32%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,360</div></div><div class="metric"><div class="k">Days Available</div><div class="v">173</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">56</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$82.7K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">32%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">44%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,360</div></div><div class="metric"><div class="k">Days Available</div><div class="v">173</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">56</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/816027328540304872">View listing</a>
       </article>
@@ -215,7 +216,7 @@
           <div class="muted small">New Durham &middot; 3.2 mi from subject</div>
           <div class="specs">Sleeps 12 / 5 BR / 5.5 BA &middot; Rating 5.00 (6 reviews)</div>
           <div class="badges"><span class="badge">Indoor fireplace</span><span class="badge">Waterfront</span><span class="badge">Beach access</span><span class="badge">Lake access</span><span class="badge">Fire pit</span><span class="badge">Kayak</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$65.3K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">14%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">14%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,245</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">50</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$65.3K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">14%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">29%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,245</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">50</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/1168919786502037648">View listing</a>
       </article>
@@ -227,7 +228,7 @@
           <div class="muted small">Alton &middot; 6.0 mi from subject</div>
           <div class="specs">Sleeps 12 / 5 BR / 4 BA &middot; Rating 5.00 (18 reviews)</div>
           <div class="badges"><span class="badge">Hot water</span><span class="badge">Board games</span><span class="badge">Fire extinguisher</span><span class="badge">Hot water kettle</span><span class="badge">Waterfront</span><span class="badge">Lake access</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$88.3K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">17%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">17%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,158</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">63</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$88.3K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">17%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">51%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,158</div></div><div class="metric"><div class="k">Days Available</div><div class="v">365</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">63</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/1110271078469655001">View listing</a>
       </article>
@@ -239,7 +240,7 @@
           <div class="muted small">Moultonborough &middot; 9.4 mi from subject</div>
           <div class="specs">Sleeps 12 / 4 BR / 3.5 BA &middot; Rating 4.98 (40 reviews)</div>
           <div class="badges"><span class="badge">Hot water</span><span class="badge">Board games</span><span class="badge">Indoor fireplace</span><span class="badge">Fire extinguisher</span><span class="badge">Waterfront</span><span class="badge">Lake access</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$133.3K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">32%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">66%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,038</div></div><div class="metric"><div class="k">Days Available</div><div class="v">176</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">116</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$133.3K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">66%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">83%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,038</div></div><div class="metric"><div class="k">Days Available</div><div class="v">176</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">116</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/28861338">View listing</a>
       </article>
@@ -251,7 +252,7 @@
           <div class="muted small">Wolfeboro &middot; 3.7 mi from subject</div>
           <div class="specs">Sleeps 10 / 5 BR / 3.5 BA &middot; Rating 4.94 (71 reviews)</div>
           <div class="badges"><span class="badge">Hot water</span><span class="badge">Fire extinguisher</span><span class="badge">Hot water kettle</span><span class="badge">Waterfront</span><span class="badge">Beach access</span><span class="badge">Lake access</span></div>
-          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$58.0K</div></div><div class="metric"><div class="k">Occupancy (full year)</div><div class="v">15%</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">33%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,007</div></div><div class="metric"><div class="k">Days Available</div><div class="v">162</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">54</div></div></div>
+          <div class="metric-grid"><div class="metric"><div class="k">Revenue Potential</div><div class="v"></div></div><div class="metric"><div class="k">Annual Revenue</div><div class="v">$58.0K</div></div><div class="metric"><div class="k">Occupancy (open nights)</div><div class="v">33%</div></div><div class="metric"><div class="k">Summer occupancy (Jun&ndash;Sep)</div><div class="v">24%</div></div><div class="metric"><div class="k">ADR</div><div class="v">$1,007</div></div><div class="metric"><div class="k">Days Available</div><div class="v">162</div></div><div class="metric"><div class="k">Nights Booked</div><div class="v">54</div></div></div>
         </div>
         <a class="card-link" href="https://www.airbnb.com/rooms/27110534">View listing</a>
       </article></div>
@@ -268,7 +269,8 @@
       <li><b>Conservative:</b> 25th percentile of comp annual revenue</li>
       <li><b>Base:</b> average of the comp median and AirROI's location estimate</li>
       <li><b>Optimistic:</b> the highest of the comp 75th percentile, AirROI's 75th-percentile estimate and the base case</li>
-      <li>Occupancy shown is the matching comp percentile. AirROI measures occupancy over the full year, so ADR = revenue &divide; (occupancy &times; 365 nights)</li></ul></div>
+      <li>Occupancy is on open nights: AirROI nights booked &divide; nights open to guests (total days minus blocked days). Each scenario uses the matching comp percentile</li>
+      <li>ADR = revenue &divide; (occupancy &times; 270 open nights, the comp median)</li></ul></div>
     <div class="info"><b class="t">Data sources</b><ul>
       <li><b>AirROI</b> /listings/search/radius, /listings/metrics/all and /calculator/estimate: comp revenue, occupancy, ADR, availability, monthly performance and AirROI's location estimate</li>
       <li><b>Published rate card:</b> Published 2027 weekly rates, Yankee Pedlar (winnire.com)</li>
