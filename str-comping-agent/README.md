@@ -34,7 +34,7 @@ python3 str-comping-agent/run.py SUBJECT.json --from-raw output/data/<slug>
    - Conservative: 25th percentile of comp revenue
    - Base: average of the comp median and AirROI's location estimate
    - Optimistic: the highest of the comp 75th percentile, AirROI's p75 estimate and the base case
-   - The occupancy shown for each scenario is the matching comp percentile. ADR = revenue / (occupancy x available nights).
+   - The occupancy shown for each scenario is the matching comp percentile. ADR = revenue / (occupancy x available nights), where available nights = AirROI `ttm_available_days` (open, unbooked) + `ttm_days_reserved` (booked).
 6. Compares the base case with the property's published rate card, if it has one.
 
 ## Data integrity

@@ -96,7 +96,10 @@ def pct(values: list[float], p: float) -> float | None:
 def scenarios(comps: list[dict], estimate: dict | None) -> dict:
     revs = [float(c["revenue"]) for c in comps if c.get("revenue") is not None]
     occs = [float(c["occupancy"]) for c in comps if c.get("occupancy") is not None]
-    days = [float(c["days_available"]) for c in comps if c.get("days_available") is not None]
+    # AirROI's ttm_available_days counts open nights that went unbooked, and its occupancy is
+    # booked / (unbooked + booked). The nights the listing was open is therefore the sum.
+    days = [float(c["days_available"]) + float(c["nights_booked"]) for c in comps
+            if c.get("days_available") is not None and c.get("nights_booked") is not None]
     adrs = [float(c["adr"]) for c in comps if c.get("adr") is not None]
 
     comp_median = median(revs) if revs else None

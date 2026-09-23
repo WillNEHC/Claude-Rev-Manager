@@ -1,0 +1,69 @@
+{
+  "html": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.html",
+  "pdf": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.pdf",
+  "conservative": {
+    "revenue": 89085.75,
+    "occupancy": 0.24775,
+    "adr": 985.1485285376609
+  },
+  "base": {
+    "revenue": 94682.56009829135,
+    "occupancy": 0.314,
+    "adr": 826.1282619168602
+  },
+  "optimistic": {
+    "revenue": 114134.02557373047,
+    "occupancy": 0.396,
+    "adr": 789.6362638282168
+  },
+  "comp_median_revenue": 98373.0,
+  "market_model_revenue": 90992.12019658268,
+  "rate_card_total": 228000,
+  "comps": [
+    {
+      "name": "New Construction, Walk to Town, Easy Lake access",
+      "city": "Wolfeboro",
+      "listing_id": 709247721434308799,
+      "annual_revenue": 87057.0
+    },
+    {
+      "name": "Luxury Wolfeboro Retreat Near Lake Winnipesaukee",
+      "city": "Wolfeboro",
+      "listing_id": 960979712329912665,
+      "annual_revenue": 101589.0
+    },
+    {
+      "name": "Luxury Lakehouse| Sunsets| Cen. Air| Private Dock",
+      "city": "Wolfeboro",
+      "listing_id": 49534550,
+      "annual_revenue": 95172.0
+    },
+    {
+      "name": "Lakeside Getaway - Lake Access/PrivateDock/Firepit",
+      "city": "Wolfeboro",
+      "listing_id": 1399234440628875772,
+      "annual_revenue": 188635.0
+    },
+    {
+      "name": "Gram's House",
+      "city": "Wolfeboro",
+      "listing_id": 984250669252369647,
+      "annual_revenue": 101574.0
+    },
+    {
+      "name": "Wolfeboro In-Town. Large Beautiful home.",
+      "city": "Wolfeboro",
+      "listing_id": 830476902214555302,
+      "annual_revenue": 19722.0
+    }
+  ],
+  "notes": [
+    "Rebuilt from saved AirROI responses in output/data/81-timberlane-wolfeboro.",
+    "New Construction, Walk to Town, Easy Lake access: AirROI did not return Revenue Potential (left blank).",
+    "Luxury Wolfeboro Retreat Near Lake Winnipesaukee: AirROI did not return Revenue Potential (left blank).",
+    "Luxury Lakehouse| Sunsets| Cen. Air| Private Dock: AirROI did not return Revenue Potential (left blank).",
+    "Lakeside Getaway - Lake Access/PrivateDock/Firepit: AirROI did not return Revenue Potential (left blank).",
+    "Gram's House: AirROI did not return Revenue Potential (left blank).",
+    "Wolfeboro In-Town. Large Beautiful home.: AirROI did not return Revenue Potential (left blank)."
+  ]
+}
