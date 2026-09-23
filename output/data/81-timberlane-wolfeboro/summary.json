@@ -2,25 +2,81 @@
   "html": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.html",
   "pdf": "/home/user/Claude-Rev-Manager/output/STR-Income-Analysis-81-Timberlane-Wolfeboro.pdf",
   "conservative": {
-    "revenue": 90992.12019658268,
-    "occupancy": 0.43050954667948726,
-    "adr": 585.0287392728575,
-    "source": "estimate"
+    "revenue": 123401.75,
+    "occupancy": 0.17852945205479454,
+    "adr": 1893.7322800811805,
+    "season_occ": 0.4546875,
+    "season_revenue": 103668.75,
+    "off_revenue": 19733.0,
+    "booked": 65.16325
   },
   "base": {
-    "revenue": 137531.81009829135,
-    "occupancy": 0.5905,
-    "adr": 638.1024212046506
+    "revenue": 191765.5,
+    "occupancy": 0.392068493150685,
+    "adr": 1340.0335418049683,
+    "season_occ": 0.643875,
+    "season_revenue": 146803.5,
+    "off_revenue": 44962.0,
+    "booked": 143.10500000000002
   },
   "optimistic": {
-    "revenue": 198345.25,
-    "occupancy": 0.6275,
-    "adr": 865.9946515308628
+    "revenue": 264287.25,
+    "occupancy": 0.6049993150684932,
+    "adr": 1196.8189706996156,
+    "season_occ": 0.7845,
+    "season_revenue": 178866.0,
+    "off_revenue": 85421.25,
+    "booked": 220.82475000000002
   },
   "comp_median_revenue": 184071.5,
   "market_model_revenue": 90992.12019658268,
   "rate_card_total": 228000,
   "comps": [
+    {
+      "name": "Lakefront Home Recently Built - Prime Spot",
+      "city": "Wolfeboro",
+      "listing_id": 1129755843361319531,
+      "bedrooms": 7,
+      "guests": 12,
+      "larger": true,
+      "annual_revenue": 179508.0,
+      "occupancy_open_nights": 0.211,
+      "occupancy_full_year": 0.211,
+      "season_occupancy": 0.504,
+      "adr": 1707.1,
+      "nights_booked": 77,
+      "days_available": 365.0
+    },
+    {
+      "name": "Winnipesaukee-Mark Island - Unique Post & Beam",
+      "city": "Gilford",
+      "listing_id": 816027328540304872,
+      "bedrooms": 5,
+      "guests": 13,
+      "larger": true,
+      "annual_revenue": 82713.0,
+      "occupancy_open_nights": 0.324,
+      "occupancy_full_year": 0.153,
+      "season_occupancy": 0.43825000000000003,
+      "adr": 1360.5,
+      "nights_booked": 56,
+      "days_available": 173.0
+    },
+    {
+      "name": "Lakefront Home Near Wolfeboro-5BR, Sauna & Kayaks",
+      "city": "New Durham",
+      "listing_id": 1168919786502037648,
+      "bedrooms": 5,
+      "guests": 12,
+      "larger": true,
+      "annual_revenue": 65292.0,
+      "occupancy_open_nights": 0.137,
+      "occupancy_full_year": 0.137,
+      "season_occupancy": 0.2925,
+      "adr": 1244.6,
+      "nights_booked": 50,
+      "days_available": 365.0
+    },
     {
       "name": "The Dam Lake House-Relax and Enjoy the Views!",
       "city": "Middleton",
@@ -65,77 +121,32 @@
       "adr": 727.1,
       "nights_booked": 231,
       "days_available": 365.0
-    },
-    {
-      "name": "Lakefront Home Recently Built - Prime Spot",
-      "city": "Wolfeboro",
-      "listing_id": 1129755843361319531,
-      "bedrooms": 7,
-      "guests": 12,
-      "larger": true,
-      "annual_revenue": 179508.0,
-      "occupancy_open_nights": 0.211,
-      "occupancy_full_year": 0.211,
-      "season_occupancy": 0.504,
-      "adr": 1707.1,
-      "nights_booked": 77,
-      "days_available": 365.0
-    },
-    {
-      "name": "Lakefront Home-Stunning Views-Hot Tub, 3100 sqft!",
-      "city": "Wakefield",
-      "listing_id": 43580051,
-      "bedrooms": 4,
-      "guests": 10,
-      "larger": false,
-      "annual_revenue": 173192.0,
-      "occupancy_open_nights": 0.57,
-      "occupancy_full_year": 0.57,
-      "season_occupancy": 0.884,
-      "adr": 679.5,
-      "nights_booked": 208,
-      "days_available": 365.0
-    },
-    {
-      "name": "Lake Front Log Cabin \u00b7 Hot Tub \u00b7 Arcade \u00b7 Fire Pit",
-      "city": "Wakefield",
-      "listing_id": 619034599472003638,
-      "bedrooms": 4,
-      "guests": 10,
-      "larger": false,
-      "annual_revenue": 168299.0,
-      "occupancy_open_nights": 0.474,
-      "occupancy_full_year": 0.474,
-      "season_occupancy": 0.717,
-      "adr": 747.4,
-      "nights_booked": 173,
-      "days_available": 365.0
     }
   ],
   "seasonal_occupancy": {
-    "season": 0.7775833333333333,
+    "season": 0.6325416666666667,
     "season_months": [
       6,
       7,
       8,
       9
     ],
-    "peak": 0.6904444444444444,
-    "shoulder": 0.4309999999999999,
+    "peak": 0.5489444444444445,
+    "shoulder": 0.32102777777777775,
     "comps_used": 6,
     "monthly_revenue": [
-      47920.0,
-      44554.0,
-      34765.0,
-      56036.0,
-      86392.0,
-      151188.0,
-      226703.0,
-      195913.0,
-      60532.0,
-      61156.0,
-      39307.0,
-      42622.0
+      36601.0,
+      30488.0,
+      25219.0,
+      45170.0,
+      77472.0,
+      114761.0,
+      210195.0,
+      177672.0,
+      53010.0,
+      40233.0,
+      34690.0,
+      26391.0
     ]
   },
   "notes": [
@@ -144,11 +155,11 @@
     "AirROI radius search: 135 listings within 12 miles matching 4-7 BR, sleeps 7-13, waterfront, lake_access, boat_slip.",
     "AirROI API calls made: 28.",
     "Report rebuilt from the saved responses of that pull (no new API calls).",
+    "Lakefront Home Recently Built - Prime Spot: AirROI did not return Revenue Potential (left blank).",
+    "Winnipesaukee-Mark Island - Unique Post & Beam: AirROI did not return Revenue Potential (left blank).",
+    "Lakefront Home Near Wolfeboro-5BR, Sauna & Kayaks: AirROI did not return Revenue Potential (left blank).",
     "The Dam Lake House-Relax and Enjoy the Views!: AirROI did not return Revenue Potential (left blank).",
     "Blue Breeze - Private lakefront w/ Hot Tub: AirROI did not return Revenue Potential (left blank).",
-    "Lakeside Getaway - Lake Access/PrivateDock/Firepit: AirROI did not return Revenue Potential (left blank).",
-    "Lakefront Home Recently Built - Prime Spot: AirROI did not return Revenue Potential (left blank).",
-    "Lakefront Home-Stunning Views-Hot Tub, 3100 sqft!: AirROI did not return Revenue Potential (left blank).",
-    "Lake Front Log Cabin \u00b7 Hot Tub \u00b7 Arcade \u00b7 Fire Pit: AirROI did not return Revenue Potential (left blank)."
+    "Lakeside Getaway - Lake Access/PrivateDock/Firepit: AirROI did not return Revenue Potential (left blank)."
   ]
 }

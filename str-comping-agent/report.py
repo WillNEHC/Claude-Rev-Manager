@@ -131,6 +131,8 @@ def comp_card(c: dict, subject_bedrooms=None, season_months=None) -> str:
     dist = f" &middot; {c['_distance_mi']:.1f} mi from subject" if c.get("_distance_mi") is not None else ""
     larger = (f'<div class="flag">Larger home: {num(c["bedrooms"])} BR vs subject {num(subject_bedrooms)} BR</div>'
               if c.get("_larger") else "")
+    if c.get("_tier"):
+        larger = f'<div class="flag" style="background:var(--sage)">{e(c["_tier"])}</div> ' + larger
     return f"""
       <article class="comp avoid-break">
         {photo_block(c.get('_photo'), c.get('name'), 'comp-img')}
@@ -227,7 +229,10 @@ def selection_lines(crit: dict) -> str:
         lines.append(f"At least {crit['min_reviews']} reviews, rated {crit.get('min_rating', '')}+")
     if crit.get("min_nights_booked"):
         lines.append(f"At least {crit['min_nights_booked']} nights booked in the last 12 months (an established, active listing)")
-    if crit.get("rank_by") == "revenue":
+    if crit.get("rank_by") == "mix":
+        lines.append("Mixed set: half are the highest nightly rates in the search (labeled Premium rate), half are the "
+                     "highest 12-month revenue (labeled Top earner)")
+    elif crit.get("rank_by") == "revenue":
         lines.append("Ranked by AirROI trailing-12-month revenue, highest first: these are the top-performing lake "
                      "homes in the search, not the average home")
     elif crit.get("rank_by") == "adr":
@@ -241,6 +246,58 @@ def endpoints_used(crit: dict) -> str:
     if crit.get("radius_search"):
         return "/listings/search/radius, /listings/metrics/all and /calculator/estimate"
     return "/listings/comparables and /calculator/estimate"
+
+
+def anchored_footnote(sc: dict, subject: dict) -> str:
+    a = sc["anchored"]
+    return (f'<p class="muted small" style="text-align:center">Annual gross revenue, year-round. Summer is priced at '
+            f'{e(subject["name"])}&#39;s own published rate ({money(a["rate"])}/night across {a["season_nights"]} '
+            f'rate-card nights); occupancy and off-season results come from {a["comps_used"]} comparable listings&#39; '
+            f'trailing-12-month AirROI data.</p>')
+
+
+def anchored_text(sc: dict, rc: dict, subject: dict, n: int) -> str:
+    a, b = sc["anchored"], sc["base"]
+    months = subject["rate_card"].get("season_months") or []
+    cb = sc.get("comp_based", {}).get("base") or {}
+    txt = (f"This projection uses {e(subject['name'])}&#39;s own summer pricing and the comps&#39; real booking "
+           f"patterns. <strong>Summer ({season_label(months)}):</strong> the published rate card totals "
+           f"{money(rc['total'])} for {rc['weeks']} weeks, or {money(a['rate'])} a night. The comps booked a median "
+           f"{pct(b['season_occ'])} of nights in those months (AirROI monthly data), so {a['season_nights']} nights "
+           f"&times; {pct(b['season_occ'])} &times; {money(a['rate'])} = <strong>{money(b['season_revenue'])}</strong>. "
+           f"<strong>Rest of the year:</strong> the comps&#39; median actual AirROI revenue outside those months is "
+           f"<strong>{money(b['off_revenue'])}</strong>. <strong>Base case:</strong> {money(b['revenue'])}, about "
+           f"{round(b['booked'])} booked nights ({pct(b['occupancy'], 1)} of the year) at a blended {money(b['adr'])} ADR. "
+           f"Conservative and Optimistic use the comps&#39; 25th and 75th percentiles for both parts.")
+    if cb.get("revenue") is not None:
+        txt += (f"<br><br><strong>Cross-check:</strong> the comps&#39; own trailing-12-month results (median revenue "
+                f"{money(sc['comp_median_revenue'])}; AirROI&#39;s typical-home estimate {money(sc['market_model_revenue'])}) "
+                f"give a comp-only base of {money(cb['revenue'])}. The difference is the summer rate: the comps average "
+                f"well below {money(a['rate'])} a night on Airbnb.")
+    gap = rc["total"] - b["revenue"]
+    txt += (f"<br><br><strong>Compared with the current summer rate card:</strong> {money(rc['total'])} if all "
+            f"{rc['weeks']} weeks sell. The base case assumes {pct(b['season_occ'])} of summer nights book at that rate, "
+            f"plus off-season income the property does not earn today. The base case is "
+            f"{money(abs(gap))} {'below' if gap > 0 else 'above'} the full rate card.")
+    return txt
+
+
+def scenario_lines(sc: dict, days) -> str:
+    if sc.get("anchored"):
+        return ("<li><b>Summer (rate-card months):</b> published rate &divide; rate-card nights = nightly rate; "
+                "&times; rate-card nights &times; the comps&#39; AirROI occupancy in those months</li>"
+                "<li><b>Off-season:</b> the comps&#39; actual AirROI revenue and booked nights in all other months</li>"
+                "<li><b>Conservative / Base / Optimistic:</b> 25th percentile / median / 75th percentile of the comps "
+                "for both parts; total = summer + off-season</li>"
+                "<li>Occupancy = booked nights &divide; 365; ADR = revenue &divide; booked nights</li>")
+    return ("<li><b>Conservative:</b> the lower of the comp 25th percentile and AirROI's location estimate for a "
+            "typical home (when it is the estimate, it is shown with the estimate's own occupancy and ADR)</li>"
+            "<li><b>Base:</b> average of the comp median and AirROI's location estimate</li>"
+            "<li><b>Optimistic:</b> the highest of the comp 75th percentile, AirROI's 75th-percentile estimate and "
+            "the base case</li>"
+            "<li>Occupancy is on open nights: AirROI nights booked &divide; nights open to guests (total days minus "
+            "blocked days). Each scenario uses the matching comp percentile</li>"
+            f"<li>ADR = revenue &divide; (occupancy &times; {days} open nights, the comp median)</li>")
 
 
 def derivation_text(sc: dict, rc: dict, subject: dict, n: int, comp_pattern: bool = False) -> str:
@@ -295,7 +352,11 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
     def tier_sub(t):
         if not t or t.get("occupancy") is None:
             return ""
-        return f"{pct(t['occupancy'], 1)} occ &middot; {money(t['adr'])} ADR"
+        line = f"{pct(t['occupancy'], 1)} occ &middot; {money(t['adr'])} ADR"
+        if t.get("season_occ") is not None:
+            line += (f"<br>Summer {pct(t['season_occ'])} at {money(sc['anchored']['rate'])}/night "
+                     f"+ off-season {money_k(t['off_revenue'])}")
+        return line
 
     adrs = [c["adr"] for c in comps if c.get("adr") is not None]
     adr_min = int(max(50, (min(adrs) if adrs else 200) * 0.5) // 25 * 25)
@@ -437,15 +498,16 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
 
 <section>
   <div class="eyebrow">Revenue Projections</div>
-  <h2>Comp-Based Annual Revenue Projection</h2>
+  <h2>{'Year-Round Annual Revenue Projection' if sc.get('anchored') else 'Comp-Based Annual Revenue Projection'}</h2>
   <div class="tiers">
     <div class="tier"><div class="lbl">Conservative</div><div class="val">{money(cons and cons['revenue'])}</div><div class="sub">{tier_sub(cons)}</div></div>
     <div class="tier base"><div class="lbl">Base Case</div><div class="val">{money(base['revenue'])}</div><div class="sub">{tier_sub(base)}</div></div>
     <div class="tier"><div class="lbl">Optimistic</div><div class="val">{money(opt and opt['revenue'])}</div><div class="sub">{tier_sub(opt)}</div></div>
   </div>
-  <p class="muted small" style="text-align:center">Annual gross revenue. Based on trailing 12-month AirROI performance of {n} comparable properties. Occupancy is measured on open nights (nights booked &divide; nights open to guests); the comps' median is {days} open nights a year{'' if sc['days_from_comps'] else ' (AirROI did not return open nights, so 365 is used)'}.</p>
+  {anchored_footnote(sc, subject) if sc.get('anchored') else ''}
+  <p class="muted small" style="text-align:center{';display:none' if sc.get('anchored') else ''}">Annual gross revenue. Based on trailing 12-month AirROI performance of {n} comparable properties. Occupancy is measured on open nights (nights booked &divide; nights open to guests); the comps' median is {days} open nights a year{'' if sc['days_from_comps'] else ' (AirROI did not return open nights, so 365 is used)'}.</p>
   {occupancy_note(comps, sc, market_occ, seasonal, subject['rate_card'].get('season_months'))}
-  <div class="derive"><strong>How the base case is derived:</strong> {derivation_text(sc, rc, subject, n, comp_pattern)}</div>
+  <div class="derive"><strong>How the base case is derived:</strong> {anchored_text(sc, rc, subject, n) if sc.get('anchored') else derivation_text(sc, rc, subject, n, comp_pattern)}</div>
 
   <h3>Interactive Performance Model</h3>
   <div class="sliders">
@@ -498,11 +560,7 @@ def render(subject: dict, comps: list[dict], sc: dict, months: list[float] | Non
       <li>{e(subject['criteria_text'])}</li>
       {selection_lines(subject['criteria'])}</ul></div>
     <div class="info"><b class="t">Scenario math</b><ul>
-      <li><b>Conservative:</b> the lower of the comp 25th percentile and AirROI's location estimate for a typical home (when it is the estimate, it is shown with the estimate's own occupancy and ADR)</li>
-      <li><b>Base:</b> average of the comp median and AirROI's location estimate</li>
-      <li><b>Optimistic:</b> the highest of the comp 75th percentile, AirROI's 75th-percentile estimate and the base case</li>
-      <li>Occupancy is on open nights: AirROI nights booked &divide; nights open to guests (total days minus blocked days). Each scenario uses the matching comp percentile</li>
-      <li>ADR = revenue &divide; (occupancy &times; {days} open nights, the comp median)</li></ul></div>
+      {scenario_lines(sc, days)}</ul></div>
     <div class="info"><b class="t">Data sources</b><ul>
       <li><b>AirROI</b> {e(endpoints_used(subject['criteria']))}: comp revenue, occupancy, ADR, availability, monthly performance and AirROI's location estimate</li>
       <li><b>Published rate card:</b> {e(subject['rate_card']['source'])}</li>

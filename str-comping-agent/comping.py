@@ -99,8 +99,23 @@ def select_comps(candidates: list[dict], criteria: dict, subject_lat=None, subje
                 -(int(c["reviews"]) if c.get("reviews") is not None else 0),
                 c["_distance_mi"] if c["_distance_mi"] is not None else 999)
 
-    pool.sort(key=sort_key)
-    chosen = pool[: criteria["count"]]
+    if criteria.get("rank_by") == "mix":
+        # Half the set: highest AirROI nightly rate. Other half: highest AirROI 12-month revenue.
+        n_rate = criteria["count"] // 2
+        by_rate = sorted(pool, key=lambda c: (-(float(c["adr"]) if c.get("adr") else 0),
+                                              -(float(c["rating"]) if c.get("rating") else 0)))
+        chosen = by_rate[:n_rate]
+        for c in chosen:
+            c["_tier"] = "Premium rate"
+        ids = {id(c) for c in chosen}
+        by_rev = sorted((c for c in pool if id(c) not in ids),
+                        key=lambda c: -(float(c["revenue"]) if c.get("revenue") else 0))
+        for c in by_rev[: criteria["count"] - n_rate]:
+            c["_tier"] = "Top earner"
+            chosen.append(c)
+    else:
+        pool.sort(key=sort_key)
+        chosen = pool[: criteria["count"]]
     primary = [c for c in chosen if c["_town_rank"] == 0]
     if towns and criteria.get("rank_by", "town") == "town" and len(primary) < criteria["count"]:
         notes.append(f"{criteria['towns'][0]} returned {len(primary)} qualifying comp(s); "
@@ -185,6 +200,52 @@ def rate_occupancy_tradeoff(pool: list[dict], estimate: dict | None, beds, min_b
     return {"pool": len(act), "n_hi_occ": len(hi),
             "n_hi_occ_1000": sum(1 for c in hi if float(c["adr"]) >= 1000), "beds": beds,
             "est_occ": (estimate or {}).get("occupancy"), "est_adr": (estimate or {}).get("average_daily_rate")}
+
+
+def anchored_scenarios(metrics_by_comp: dict, rate_card: dict) -> dict | None:
+    """Year-round projection anchored on the subject's own published summer rate.
+
+    Summer (rate-card season): published nightly equivalent (rate-card total / nights) x the comps'
+    AirROI occupancy over those months, applied to the rate-card nights.
+    Off-season (all other months): the comps' actual AirROI revenue and booked nights in those months.
+    Each tier uses the matching comp percentile (25th / median / 75th) of each component.
+    """
+    import calendar
+    months = set(rate_card.get("season_months") or [])
+    weeks = sum(p["weeks"] for p in rate_card["periods"])
+    total = sum(p["weeks"] * p["weekly_rate"] for p in rate_card["periods"])
+    nights = weeks * 7
+    rate = total / nights
+    s_occ, off_rev, off_nights = [], [], []
+    for rows in metrics_by_comp.values():
+        if not rows:
+            continue
+        so = season_occupancy(rows, months)
+        if so is None:
+            continue
+        rev = nts = 0.0
+        for r in rows:
+            d = str(r.get("date") or "")
+            if len(d) < 7 or int(d[5:7]) in months:
+                continue
+            occ = float(r.get("occupancy") or 0)
+            occ = occ / 100 if occ > 1 else occ
+            rev += float(r.get("revenue") or 0)
+            nts += occ * calendar.monthrange(int(d[:4]), int(d[5:7]))[1]
+        s_occ.append(so)
+        off_rev.append(rev)
+        off_nights.append(nts)
+    if not s_occ:
+        return None
+    out = {"rate": rate, "season_nights": nights, "comps_used": len(s_occ)}
+    for name, p in (("conservative", 0.25), ("base", 0.5), ("optimistic", 0.75)):
+        so, orv, onts = pct(s_occ, p), pct(off_rev, p), pct(off_nights, p)
+        s_rev = rate * nights * so
+        booked = nights * so + onts
+        rev = s_rev + orv
+        out[name] = {"revenue": rev, "occupancy": booked / 365, "adr": rev / booked if booked else None,
+                     "season_occ": so, "season_revenue": s_rev, "off_revenue": orv, "booked": booked}
+    return out
 
 
 PEAK_MONTHS = (5, 6, 7, 8, 9, 10)  # May-Oct, as in the reference reports; Nov-Apr is shoulder

@@ -45,6 +45,13 @@ python3 str-comping-agent/run.py SUBJECT.json --from-raw output/data/<slug>
    - Optimistic: the highest of the comp 75th percentile, AirROI's p75 estimate and the base case
    - Occupancy is on open nights: AirROI `ttm_adjusted_occupancy` (nights booked / nights open to guests). Each scenario uses the matching comp percentile. ADR = revenue / (occupancy x median open nights of the comps), which recovers revenue per booked night.
    - Each comp also shows its average AirROI monthly occupancy over the subject's rate-card season.
+   - With `criteria.anchor_rate_card: true` and a rate card, the tiers are instead year-round and anchored on the
+     subject's own summer pricing: summer = (rate-card total / rate-card nights) x rate-card nights x the comps'
+     AirROI occupancy in the rate-card months; off-season = the comps' actual AirROI revenue and booked nights in all
+     other months. 25th percentile / median / 75th percentile of the comps for Conservative / Base / Optimistic.
+     The comp-only tiers are kept as a cross-check.
+   - `rank_by: "mix"` takes half the comps by highest nightly rate ("Premium rate") and half by highest 12-month
+     revenue ("Top earner").
 6. Compares the base case with the property's published rate card, if it has one.
 
 ## Data integrity

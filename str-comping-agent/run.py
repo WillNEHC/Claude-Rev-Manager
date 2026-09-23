@@ -211,6 +211,14 @@ def main() -> int:
                                                        "notes": pull_notes}, indent=2))
 
     sc = comping.scenarios(comps, estimate)
+    if subject["criteria"].get("anchor_rate_card") and subject.get("rate_card"):
+        anch = comping.anchored_scenarios(metrics, subject["rate_card"])
+        if anch:
+            sc["comp_based"] = {k: sc[k] for k in ("conservative", "base", "optimistic")}
+            sc["anchored"] = anch
+            for k in ("conservative", "base", "optimistic"):
+                sc[k] = anch[k]
+            sc["days_used"] = 365
     months = comping.monthly_split(estimate, sc["base"]["revenue"],
                                    (seasonal or {}).get("monthly_revenue"))
     rc = comping.rate_card_comparison(subject["rate_card"], sc["base"]["revenue"], months, sc)

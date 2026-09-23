@@ -58,7 +58,7 @@
     "min_rating": 4.8,
     "min_reviews": 3,
     "require_water": true,
-    "rank_by": "revenue",
+    "rank_by": "mix",
     "radius_search": {
       "radius_miles": 12,
       "amenities_any": [
@@ -74,7 +74,8 @@
       "Alton",
       "Moultonborough"
     ],
-    "min_nights_booked": 30
+    "min_nights_booked": 30,
+    "anchor_rate_card": true
   },
   "criteria_text": "4-7 bedrooms (subject has 4; larger homes are labeled), sleeps 7-13 (subject sleeps 10, plus or minus 3), waterfront, lake access or boat slip, rated 4.8+"
 }
