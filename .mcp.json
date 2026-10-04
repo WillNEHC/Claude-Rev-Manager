@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "hospitable": {
+      "command": "bash",
+      "args": ["revenue-manager/scripts/run-hospitable-mcp.sh"]
+    }
+  }
+}
