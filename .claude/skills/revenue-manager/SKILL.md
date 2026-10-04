@@ -479,6 +479,30 @@ When the operator runs a daily review, walk the next 30 days for every property:
 6. **Last-minute discounts** — fill 3–7 day gaps
 7. **Weekend premiums** — leisure markets
 
+## Step 6.10 — Status ratings (New England Host Co. house style — use in EVERY property report)
+
+The operator wants every property-level report to carry a color status. Use exactly these four, and nothing else:
+
+| Emoji | Meaning |
+|---|---|
+| 🔵 | **Perfect** — beating the market; protect it, consider raising rates |
+| 🟢 | **Good** — at or slightly ahead of market; no action needed |
+| 🟡 | **OK** — slightly behind or a known soft spot; watch it |
+| 🔴 | **Needs action** — clearly behind; act now |
+
+Use ⚪ only when there is genuinely not enough data to rate (say why, e.g. "not launched", "no STLY history").
+
+**Thresholds (deterministic — apply the same way every run):**
+
+| Metric | 🔵 Perfect | 🟢 Good | 🟡 OK | 🔴 Needs action |
+|---|---|---|---|---|
+| **Pace** — your next-30-day occupancy minus market occupancy (PriceLabs `occupancy_next_30` vs `market_occupancy_next_30`) | ≥ +10 pts | −2 to +10 pts | −10 to −2 pts | < −10 pts, or 0% booked while market > 10% |
+| **Growth** — your RevPAR % change vs STLY minus the market's RevPAR % change vs STLY | ≥ +10 pts | −2 to +10 pts | −10 to −2 pts | < −10 pts |
+| **Price position** — your base vs same-bedroom comp median, read together with Pace | Pace 🔵/🟢 and base within the comp 25th–75th band | Base within ±15% of comp median and Pace not 🔴 | Pace 🔵 while base < comp median (likely underpriced), or base > comp 75th with Pace 🟡 | Price pinned at the floor or ceiling on peak/high-demand dates, or base > comp median with Pace 🔴 |
+| **Booking window** — share of the next 30 nights booked vs the share this property's own last-12-month lead-time history says should already be booked | ≥ 110% of expected | 90–110% | 70–90% | < 70% |
+
+**Overall property status** = the worst rating among its metrics (any 🔴 → 🔴; else any 🟡 → 🟡; all 🔵 → 🔵; otherwise 🟢). Put the overall emoji next to the property name in every heading/table, and the per-metric emojis in the detail rows. Always show the number behind each emoji — the emoji summarizes, it never replaces the data.
+
 ## Step 7 — Present recommendations (every one clears the safety layer + the framework)
 
 Structure each recommendation through the approval-gate shape (2.6), with framework reasoning:
