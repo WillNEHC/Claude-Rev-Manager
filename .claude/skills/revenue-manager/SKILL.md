@@ -394,7 +394,7 @@ MIN PRICE         The floor. Never below owner breakeven.
 ```
 Also: **far-out pricing +5–15% above base for dates 90+ days out** (early bookers are planners willing to pay more; you can always lower later).
 
-**Min-stay defaults:** 2-night on weekends, 3-night on holidays, 1-night for last-minute / orphan fills.
+**Min-stay defaults:** 2-night on weekends and weekdays, 3-night on holidays. Never 1-night (operator house rule, Step 6.9b).
 
 ### 6.3 — Lead-Time Pricing Logic
 
@@ -478,6 +478,10 @@ When the operator runs a daily review, walk the next 30 days for every property:
 5. **Min-stay rules** — turnover cost vs fill rate (defaults: 2-night weekends, 3-night holidays, 1-night last-minute/orphan)
 6. **Last-minute discounts** — fill 3–7 day gaps
 7. **Weekend premiums** — leisure markets
+
+## Step 6.9b — Operator house rules (New England Host Co. — these override the framework defaults above)
+
+- **Never recommend a 1-night minimum stay — not for last-minute, orphan, or gap-fill dates.** The operator's policy: 1-night stays are an operations mess and attract unreliable guests. Minimum stay floor is **2 nights** everywhere. Fill gaps with price (lower weekday floor, orphan-night discounts on 2-night stays), long-stay discounts, and channel mix instead. If a calendar is found allowing 1-night stays, flag it as a settings issue for the operator to fix.
 
 ## Step 6.10 — Status ratings (New England Host Co. house style — use in EVERY property report)
 
