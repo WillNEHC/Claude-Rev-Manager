@@ -405,7 +405,7 @@ Also: **far-out pricing +5–15% above base for dates 90+ days out** (early book
 | **30–60 days** | At base. Start watching closely. | If behind pace, begin small adjustments here. |
 | **14–30 days** | Evaluate carefully. Small drops if needed. | Decision window. Compare to comp availability. |
 | **7–14 days** | Enable last-minute discounts (10–20%). | Still open → better to fill at a discount than $0. |
-| **0–7 days** | Aggressive discounting if still open. | Drop minimums to 1 night. Accept 1-night stays. Fill at any reasonable rate. |
+| **0–7 days** | Aggressive discounting if still open. | Fill at any reasonable rate — keep the 2-night minimum (never 1-night, Step 6.9b). |
 
 ### 6.4 — The Pricing Decision Framework (5 ordered questions)
 
@@ -475,7 +475,7 @@ When the operator runs a daily review, walk the next 30 days for every property:
 2. **Max price ceiling** — fully booked → ceiling too low
 3. **Min price floor** — too many dates pinned to it → lower or trust the algo
 4. **Seasonal DSOs** — holidays, events, peak/shoulder/off
-5. **Min-stay rules** — turnover cost vs fill rate (defaults: 2-night weekends, 3-night holidays, 1-night last-minute/orphan)
+5. **Min-stay rules** — turnover cost vs fill rate (defaults: 2-night everywhere, 3-night holidays; never 1-night — Step 6.9b)
 6. **Last-minute discounts** — fill 3–7 day gaps
 7. **Weekend premiums** — leisure markets
 
