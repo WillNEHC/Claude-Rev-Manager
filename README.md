@@ -66,6 +66,20 @@ src/                    (Build phase) Next.js app, ingestion adapters, jobs, AI 
 
 A concrete extraction contract lives at [`docs/schemas/review-extraction.schema.json`](docs/schemas/review-extraction.schema.json).
 
+## Nearby Demand Finder (standalone tool)
+[`docs/attractions/index.html`](docs/attractions/index.html) is a single-page tool. Paste an Airbnb,
+VRBO, Zillow or Realtor.com link, or an address. It lists the ski areas, beaches, boat launches,
+restaurants, breweries, golf, attractions, grocery stores and hospitals within a real **drive
+time** of the property, along with a location score.
+
+- **Data:** OpenStreetMap for places (via Overpass), Nominatim for address search, and the OSRM
+  demo server for drive times. No API keys, no cost, and nothing is scraped from listing sites.
+- **Airbnb/VRBO:** these sites leave the address out of the link, so the tool asks for the town
+  shown on the listing, or the address if you have it.
+- **Hosting:** GitHub Pages. Go to Settings → Pages → *Deploy from a branch* → pick the branch →
+  folder `/docs`. The tool is then at `https://<user>.github.io/Claude-Rev-Manager/attractions/`.
+  `docs/.nojekyll` makes GitHub serve the files as they are.
+
 ## Testing & verification
 - **Unit + integration:** `npm run typecheck && npm test` — 27 tests: config
   validation, dedup hashing, discovery filtering, Airbnb parsing against

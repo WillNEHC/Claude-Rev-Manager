@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nearby Demand Finder</title>
+<meta name="description" content="Paste an address or listing link to see ski areas, lakes, restaurants and things to do within a real drive time. Data from OpenStreetMap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Layout: search bar on top; results column + sticky map on desktop, stacked on phones. */
+:root {
+  --bg: #f4f6f3;
+  --surface: #ffffff;
+  --ink: #16211c;
+  --muted: #56665e;
+  --line: #d6ddd7;
+  --accent: #1d5c47;
+  --accent-ink: #ffffff;
+  --chip: #e6ece7;
+  --warn: #9a5a06;
+  --warn-bg: #fbf1e1;
+  --bad: #a2302a;
+  --bad-bg: #fbe9e7;
+  --good: #23704f;
+  --g-mtn: #5d4f93;
+  --g-water: #2470b0;
+  --g-food: #b9512b;
+  --g-do: #2e8556;
+  --g-svc: #6c737a;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1412; --surface: #161f1b; --ink: #e4ebe7; --muted: #98a9a0; --line: #2a3530;
+    --accent: #5dbb94; --accent-ink: #0b1a14; --chip: #222d28;
+    --warn: #e2a64a; --warn-bg: #2d2416; --bad: #ee7b72; --bad-bg: #2f1a18; --good: #6ccf9f;
+    --g-mtn: #9d8fe0; --g-water: #63a9e6; --g-food: #ec8a62; --g-do: #63c48d; --g-svc: #a5adb4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1412; --surface: #161f1b; --ink: #e4ebe7; --muted: #98a9a0; --line: #2a3530;
+  --accent: #5dbb94; --accent-ink: #0b1a14; --chip: #222d28;
+  --warn: #e2a64a; --warn-bg: #2d2416; --bad: #ee7b72; --bad-bg: #2f1a18; --good: #6ccf9f;
+  --g-mtn: #9d8fe0; --g-water: #63a9e6; --g-food: #ec8a62; --g-do: #63c48d; --g-svc: #a5adb4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+a { color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1240px; margin: 0 auto; }
+
+header.top { padding-block: 28px 18px; display: grid; gap: 6px; }
+.brand { font-family: var(--f-display); font-stretch: 80%; font-weight: 800; font-size: clamp(28px, 4.4vw, 40px); letter-spacing: -0.01em; line-height: 1.05; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 62ch; }
+
+form.search { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+#q { flex: 1 1 320px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+#cutoff { padding: 11px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.btn { border: 0; border-radius: 8px; padding: 12px 18px; background: var(--accent); color: var(--accent-ink); font-weight: 600; cursor: pointer; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn.ghost { background: var(--chip); color: var(--ink); font-weight: 500; padding: 8px 12px; }
+.groups { display: flex; gap: 8px 16px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+.groups label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.examples { font-size: 13px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.examples button { background: none; border: 1px dashed var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; color: var(--muted); }
+
+.notice { border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.notice.warn { background: var(--warn-bg); color: var(--warn); }
+.notice.bad { background: var(--bad-bg); color: var(--bad); }
+.status { font-family: var(--f-mono); font-size: 13px; color: var(--muted); min-height: 1.5em; }
+
+main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 20px; margin-top: 20px; align-items: start; }
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } .mapcol { order: -1; } }
+.mapcol { position: sticky; top: calc(12px + env(safe-area-inset-top, 0px)); display: grid; gap: 10px; }
+@media (max-width: 900px) { .mapcol { position: static; } }
+#map { height: 460px; border-radius: 10px; border: 1px solid var(--line); background: var(--chip); }
+@media (max-width: 900px) { #map { height: 300px; } }
+.maphint { font-size: 12px; color: var(--muted); }
+
+.origin { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; }
+.origin h2 { margin: 0; font-family: var(--f-display); font-stretch: 85%; font-size: 20px; line-height: 1.2; }
+.precision { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--chip); letter-spacing: .02em; }
+.precision.exact { color: var(--good); }
+.precision.approx { color: var(--warn); background: var(--warn-bg); }
+.alts { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.alts button { background: var(--chip); border: 0; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 13px; text-align: left; }
+
+.score { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; margin-top: 16px; }
+.score-head { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+.score-num { font-family: var(--f-display); font-stretch: 75%; font-weight: 800; font-size: 56px; line-height: 1; font-variant-numeric: tabular-nums; }
+.score-num small { font-size: 26px; color: var(--muted); font-weight: 600; }
+.score-label { color: var(--muted); max-width: 46ch; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.tile { border-top: 3px solid var(--gc); padding-top: 8px; display: grid; gap: 2px; min-width: 0; }
+.tile .t-name { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.tile .t-big { font-family: var(--f-display); font-stretch: 80%; font-size: 22px; font-weight: 700; }
+.tile .t-near { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+details.method { font-size: 13px; color: var(--muted); }
+details.method summary { cursor: pointer; color: var(--ink); }
+details.method ul { padding-left: 18px; margin: 6px 0 0; }
+
+section.group { margin-top: 26px; }
+section.group > h3 { font-family: var(--f-display); font-stretch: 85%; font-size: 22px; margin: 0 0 10px; display: flex; gap: 10px; align-items: center; }
+section.group > h3 .swatch { width: 12px; height: 12px; }
+section.group > h3 .gmeta { font-family: var(--f-body); font-size: 13px; font-weight: 500; color: var(--muted); }
+.cat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.cat-head { display: flex; justify-content: space-between; gap: 10px; padding: 12px 14px; align-items: baseline; flex-wrap: wrap; }
+.cat-head h4 { margin: 0; font-size: 16px; }
+.pill { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+.pill.has { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
+.pill.none { background: var(--bad-bg); color: var(--bad); }
+ol.places { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+ol.places li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+ol.places li:last-child { border-bottom: 0; }
+.time { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; }
+.time small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.pname { font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+.pname:hover { text-decoration: underline; }
+.pmeta { font-size: 13px; color: var(--muted); display: flex; gap: 4px 12px; flex-wrap: wrap; }
+.pmeta a { color: var(--muted); }
+.flag { color: var(--warn); }
+.more { width: 100%; border: 0; border-top: 1px solid var(--line); background: none; padding: 9px; cursor: pointer; color: var(--accent); font-weight: 600; }
+.empty-cat { padding: 0 14px 12px; font-size: 14px; color: var(--muted); }
+
+.intro { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 10px; max-width: 74ch; }
+.intro h2 { margin: 0; font-family: var(--f-display); font-stretch: 85%; font-size: 22px; }
+.intro ul { margin: 0; padding-left: 18px; }
+
+footer { margin-top: 36px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand">Nearby Demand Finder</h1>
+    <p class="sub">Paste an Airbnb, VRBO, Zillow or Realtor.com link, or type an address or town. You'll see the ski areas, lakes, restaurants and things to do within a real drive time of the property.</p>
+  </header>
+
+  <form class="search" id="form" autocomplete="off">
+    <div class="row">
+      <input id="q" type="text" placeholder="Paste an Airbnb, VRBO, Zillow or Realtor.com link, or type an address" aria-label="Address or link">
+      <label for="cutoff" class="sr">
+        <select id="cutoff" aria-label="Drive time cutoff">
+          <option value="10">10 min drive</option>
+          <option value="15">15 min drive</option>
+          <option value="30" selected>30 min drive</option>
+          <option value="45">45 min drive</option>
+          <option value="60">60 min drive</option>
+        </select>
+      </label>
+      <button class="btn" id="go" type="submit">Find nearby</button>
+    </div>
+    <div class="row" id="areaRow" hidden>
+      <input id="area" type="text" placeholder="Town from the listing, e.g. Madison, NH (or the exact address if you have it)" aria-label="Town or address for the Airbnb/VRBO listing" style="flex:1 1 320px;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg)">
+    </div>
+    <div class="groups" id="groupToggles"></div>
+    <div class="examples">Try:
+      <button type="button" data-ex="https://www.airbnb.com/rooms/51867236" data-area="Madison, NH">Alpine Retreat (Airbnb, Madison NH)</button>
+      <button type="button" data-ex="Gilford, NH">Gilford, NH</button>
+      <button type="button" data-ex="Holderness, NH 03245">Holderness, NH</button>
+      <button type="button" data-ex="Lincoln, NH 03251">Lincoln, NH</button>
+    </div>
+    <div id="formMsg" hidden></div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </form>
+
+  <main>
+    <div class="resultscol" id="results">
+      <div class="intro">
+        <h2>How it works</h2>
+        <ul>
+          <li><strong>Finds the property</strong> using OpenStreetMap's address search. If it can't find the exact house, it tells you whether it matched the street or only the town. You can drag the pin on the map to fix it.</li>
+          <li><strong>Pulls real mapped places</strong> from OpenStreetMap in 15 categories: ski areas, beaches, boat launches, restaurants, breweries, golf, grocery, hospitals and more.</li>
+          <li><strong>Measures actual driving time</strong> on the road network, not a straight-line circle. A lake between you and a ski hill counts. Times are estimates without traffic.</li>
+          <li><strong>Scores the location</strong> by how many of the categories have at least one place within your drive-time cutoff. It's like a report card with one box per category: the score is how many boxes are checked. Nothing in it is guessed.</li>
+        </ul>
+        <p class="sub">If you paste an Airbnb or VRBO link, a second box appears. Type the town shown on the listing there, because those sites hide the exact address.</p>
+      </div>
+    </div>
+    <div class="mapcol">
+      <div id="map" role="region" aria-label="Map of results"></div>
+      <div class="maphint" id="maphint">The map fills in after a search. You can drag the pin to correct the property location.</div>
+    </div>
+  </main>
+
+  <footer>
+    <div>Place data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> (ODbL). Address search: Nominatim. Drive times: OSRM, on the OpenStreetMap road network without traffic.</div>
+    <div>OpenStreetMap is edited by volunteers, so it can miss newer businesses or still list closed ones. Check anything important, like a restaurant you plan to name in a listing, before you rely on it.</div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(() => {
+"use strict";
+
+// ---------- Category definitions (OpenStreetMap tags) ----------
+// `wide` categories are rare enough to search the full drive-time radius;
+// dense ones are capped at DENSE_MAX_KM since only the nearest PER_CAT are kept.
+const GROUPS = [
+  { id: "mtn",   label: "Skiing & mountains",       color: "--g-mtn" },
+  { id: "water", label: "Lakes, beaches & boating", color: "--g-water" },
+  { id: "food",  label: "Food & drink",             color: "--g-food" },
+  { id: "do",    label: "Things to do",             color: "--g-do" },
+  { id: "svc",   label: "Guest services",           color: "--g-svc" },
+];
+const UI_GROUPS = [ // the checkboxes; services ride along with "Things to do"
+  { id: "mtn", label: "Skiing & mountains", groups: ["mtn"] },
+  { id: "water", label: "Lakes, beaches & boating", groups: ["water"] },
+  { id: "food", label: "Food & drink", groups: ["food"] },
+  { id: "do", label: "Things to do & services", groups: ["do", "svc"] },
+];
+// Order here is match priority: an element goes to the first category that matches.
+const CATS = [
+  { id: "ski", group: "mtn", label: "Ski areas", wide: true,
+    sel: ['nwr["landuse"="winter_sports"]["name"]'],
+    match: t => t.landuse === "winter_sports" },
+  { id: "golf", group: "do", label: "Golf courses", wide: true,
+    sel: ['nwr["leisure"="golf_course"]["name"]'],
+    match: t => t.leisure === "golf_course" },
+  { id: "brewery", group: "food", label: "Breweries, wineries & distilleries", wide: true,
+    sel: ['nwr["craft"~"^(brewery|winery|distillery)$"]["name"]', 'nwr["microbrewery"="yes"]["name"]'],
+    match: t => /^(brewery|winery|distillery)$/.test(t.craft || "") || t.microbrewery === "yes" },
+  { id: "hospital", group: "svc", label: "Hospitals", wide: true,
+    sel: ['nwr["amenity"="hospital"]["name"]'],
+    match: t => t.amenity === "hospital" },
+  { id: "grocery", group: "svc", label: "Grocery stores", wide: false,
+    sel: ['nwr["shop"="supermarket"]["name"]'],
+    match: t => t.shop === "supermarket" },
+  { id: "marina", group: "water", label: "Marinas", wide: true,
+    sel: ['nwr["leisure"="marina"]["name"]'],
+    match: t => t.leisure === "marina" },
+  { id: "launch", group: "water", label: "Boat launches", wide: true, allowUnnamed: true,
+    sel: ['nwr["leisure"="slipway"]'],
+    match: t => t.leisure === "slipway" },
+  { id: "beach", group: "water", label: "Beaches", wide: true,
+    sel: ['nwr["natural"="beach"]["name"]', 'nwr["leisure"="beach_resort"]["name"]'],
+    match: t => t.natural === "beach" || t.leisure === "beach_resort" },
+  { id: "attraction", group: "do", label: "Attractions & museums", wide: true,
+    sel: ['nwr["tourism"~"^(attraction|museum|theme_park|zoo|aquarium|gallery)$"]["name"]'],
+    match: t => /^(attraction|museum|theme_park|zoo|aquarium|gallery)$/.test(t.tourism || "") },
+  { id: "entertain", group: "do", label: "Theaters & entertainment", wide: true,
+    sel: ['nwr["amenity"~"^(theatre|cinema|arts_centre)$"]["name"]', 'nwr["leisure"~"^(water_park|miniature_golf)$"]["name"]'],
+    match: t => /^(theatre|cinema|arts_centre)$/.test(t.amenity || "") || /^(water_park|miniature_golf)$/.test(t.leisure || "") },
+  { id: "trail", group: "mtn", label: "Hiking trailheads", wide: false,
+    sel: ['nwr["highway"="trailhead"]["name"]'],
+    match: t => t.highway === "trailhead" },
+  { id: "restaurant", group: "food", label: "Restaurants", wide: false,
+    sel: ['nwr["amenity"="restaurant"]["name"]'],
+    match: t => t.amenity === "restaurant" },
+  { id: "cafe", group: "food", label: "Cafes & ice cream", wide: false,
+    sel: ['nwr["amenity"~"^(cafe|ice_cream)$"]["name"]'],
+    match: t => /^(cafe|ice_cream)$/.test(t.amenity || "") },
+  { id: "bar", group: "food", label: "Bars & pubs", wide: false,
+    sel: ['nwr["amenity"~"^(bar|pub)$"]["name"]'],
+    match: t => /^(bar|pub)$/.test(t.amenity || "") },
+  { id: "park", group: "do", label: "Parks & nature preserves", wide: false,
+    sel: ['nwr["leisure"~"^(park|nature_reserve)$"]["name"]'],
+    match: t => /^(park|nature_reserve)$/.test(t.leisure || "") },
+];
+const DISPLAY_ORDER = ["ski", "trail", "beach", "marina", "launch", "restaurant", "brewery", "cafe", "bar",
+  "attraction", "entertain", "golf", "park", "grocery", "hospital"];
+
+const PER_CAT = 25;          // nearest N per category get drive-timed
+const KM_PER_MIN = 1.8;      // straight-line search radius per minute of cutoff (~67 mph as the crow flies)
+const WIDE_MAX_KM = 110;
+const DENSE_MAX_KM = 40;
+const OSRM_CHUNK = 80;
+const SNAP_WARN_M = 1500;
+
+const OVERPASS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+];
+const NOMINATIM = "https://nominatim.openstreetmap.org/search";
+const OSRM = "https://router.project-osrm.org/table/v1/driving/";
+
+// ---------- DOM ----------
+const $ = id => document.getElementById(id);
+const form = $("form"), qEl = $("q"), cutoffEl = $("cutoff"), goBtn = $("go");
+const statusEl = $("status"), formMsg = $("formMsg"), resultsEl = $("results");
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
+};
+
+// group checkboxes
+const savedGroups = (store.get("ndf.groups") || "").split(",").filter(Boolean);
+$("groupToggles").innerHTML = UI_GROUPS.map(g => {
+  const on = savedGroups.length ? savedGroups.includes(g.id) : true;
+  const color = GROUPS.find(x => x.id === g.groups[0]).color;
+  return `<label><input type="checkbox" id="grp-${g.id}" value="${g.id}" ${on ? "checked" : ""}>
+    <span class="swatch" style="background:var(${color})"></span>${esc(g.label)}</label>`;
+}).join("");
+const savedCut = store.get("ndf.cutoff");
+if (savedCut && [...cutoffEl.options].some(o => o.value === savedCut)) cutoffEl.value = savedCut;
+
+document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", () => {
+  qEl.value = b.dataset.ex; $("area").value = b.dataset.area || ""; form.requestSubmit();
+}));
+
+function setStatus(t) { statusEl.textContent = t; }
+function showMsg(html, kind = "warn") { formMsg.className = `notice ${kind}`; formMsg.innerHTML = html; formMsg.hidden = false; }
+function clearMsg() { formMsg.hidden = true; formMsg.innerHTML = ""; }
+
+// ---------- Input parsing ----------
+function parseInput(raw) {
+  const s = raw.trim();
+  if (!s) return { error: "Type an address, a town, or paste a Zillow or Realtor.com link." };
+  const ll = s.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)$/);
+  if (ll) return { lat: +ll[1], lng: +ll[2], label: s, source: "coordinates" };
+  let url = null;
+  if (/^https?:\/\//i.test(s) || /^(www\.)?[a-z0-9-]+\.(com|net|org)\//i.test(s)) {
+    try { url = new URL(/^https?:/i.test(s) ? s : "https://" + s); } catch { url = null; }
+  }
+  if (!url) return { query: s, source: "text" };
+
+  const host = url.hostname.replace(/^www\./, "").toLowerCase();
+  const segs = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
+
+  if (/(^|\.)airbnb\.|(^|\.)vrbo\.|(^|\.)homeaway\./.test(host)) {
+    const site = /airbnb/.test(host) ? "Airbnb" : "VRBO";
+    const idm = url.pathname.match(/\/(?:rooms|h)\/(?:plus\/)?(\d+)/) || url.pathname.match(/\/(\d{4,})(?:[a-z]+)?$/i);
+    return { listing: { site, id: idm ? idm[1] : "" }, source: `${site} link` };
+  }
+  if (host.endsWith("zillow.com")) {
+    const i = segs.findIndex(x => x === "homedetails" || x === "b");
+    const slug = i >= 0 ? segs[i + 1] : null;
+    if (slug && /\d/.test(slug)) return { query: slug.replace(/-/g, " "), source: "Zillow link" };
+    return { error: "I couldn't read an address from that Zillow link. Open the home's own page (the link has /homedetails/ in it), or type the address." };
+  }
+  if (host.endsWith("realtor.com")) {
+    const i = segs.findIndex(x => x === "realestateandhomes-detail");
+    const slug = i >= 0 ? segs[i + 1] : null;
+    if (slug) {
+      const parts = slug.split("_").filter(p => !/^M\d/.test(p));
+      if (parts.length >= 3) {
+        const street = parts[0].replace(/-/g, " ");
+        const city = (parts[1] || "").replace(/-/g, " ");
+        const rest = parts.slice(2).join(" ");
+        return { query: `${street}, ${city}, ${rest}`, source: "Realtor.com link" };
+      }
+    }
+    return { error: "I couldn't read an address from that Realtor.com link. Open the home's own page, or type the address." };
+  }
+  if (/google\./.test(host) || host === "maps.app.goo.gl" || host === "goo.gl") {
+    const full = url.href;
+    const pin = full.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || full.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (pin) return { lat: +pin[1], lng: +pin[2], label: "Google Maps pin", source: "Google Maps link" };
+    const q = url.searchParams.get("q") || url.searchParams.get("query");
+    if (q) return parseInput(q);
+    return { error: "Short Google Maps share links (maps.app.goo.gl) can't be read here. Open the link, copy the full address bar URL, or type the address." };
+  }
+  return { error: "I can read Zillow, Realtor.com and Google Maps links. For any other site, type the address." };
+}
+
+// ---------- Network helpers ----------
+async function fetchJSON(url, opts = {}, timeoutMs = 30000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, { ...opts, signal: ctl.signal });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+
+async function nominatim(params) {
+  const u = new URL(NOMINATIM);
+  Object.entries({ format: "jsonv2", addressdetails: "1", limit: "5", ...params }).forEach(([k, v]) => u.searchParams.set(k, v));
+  let res;
+  try { res = await fetchJSON(u.href, { headers: { "Accept-Language": "en" } }); }
+  catch { await sleep(2500); res = await fetchJSON(u.href, { headers: { "Accept-Language": "en" } }); }
+  await sleep(1100); // Nominatim usage policy: max 1 request per second
+  return res;
+}
+
+function precisionOf(r, attempt) {
+  const a = r.address || {};
+  if (attempt === 0 && a.house_number) return { cls: "exact", text: "Exact address match" };
+  if (attempt === 0 && (r.category === "building" || r.type === "house")) return { cls: "exact", text: "Building match" };
+  if (a.road && (r.category === "highway" || r.addresstype === "road")) return { cls: "approx", text: "Matched the street, not the exact house" };
+  if (r.addresstype === "postcode") return { cls: "approx", text: "Matched the ZIP code area only" };
+  if (/^(city|town|village|hamlet|municipality|county|state|suburb|neighbourhood)$/.test(r.addresstype || "")) return { cls: "approx", text: "Matched the town or area center only" };
+  if (attempt === 0) return { cls: "exact", text: "Place match" };
+  return { cls: "approx", text: "Approximate match" };
+}
+
+async function geocode(query) {
+  const attempts = [{ q: query }];
+  const noNum = query.replace(/^\s*\d+[a-z]?\s+/i, "");
+  if (noNum !== query) attempts.push({ q: noNum });
+  const zip = query.match(/\b(\d{5})(?:-\d{4})?\b/);
+  if (zip) attempts.push({ postalcode: zip[1], countrycodes: "us" });
+  const parts = query.split(",").map(x => x.trim()).filter(Boolean);
+  if (parts.length >= 3) attempts.push({ q: parts.slice(-2).join(", ") });
+
+  for (let i = 0; i < attempts.length; i++) {
+    setStatus(i === 0 ? "Finding the address…" : "Exact address not found, trying a broader match…");
+    const res = await nominatim(attempts[i]);
+    if (res && res.length) {
+      return res.map(r => ({
+        lat: +r.lat, lng: +r.lon, label: r.display_name,
+        town: (r.address && (r.address.town || r.address.city || r.address.village || r.address.hamlet || r.address.county)) || "",
+        precision: precisionOf(r, i),
+      }));
+    }
+  }
+  return [];
+}
+
+let goodEndpoint = 0; // remember which server answered last so later queries start there
+async function overpass(query) {
+  let lastErr;
+  for (let k = 0; k < OVERPASS.length * 2; k++) { // two passes over the servers; busy servers often free up in seconds
+    if (k === OVERPASS.length) await sleep(4000);
+    const idx = (goodEndpoint + k) % OVERPASS.length;
+    try {
+      const res = await fetchJSON(OVERPASS[idx], { method: "POST", body: "data=" + encodeURIComponent(query),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" } }, 65000);
+      if (res.remark && /error|timed out|out of memory/i.test(res.remark)) throw new Error(res.remark);
+      goodEndpoint = idx;
+      return res;
+    } catch (e) { lastErr = e; }
+  }
+  throw new Error(lastErr && lastErr.message || "unreachable");
+}
+// Runs queries two at a time (public servers allow ~2 slots per user). Failed groups are reported, not hidden.
+async function overpassAll(queries, onProgress) {
+  const elements = [], failedGroups = new Set();
+  let next = 0, done = 0;
+  async function worker() {
+    while (next < queries.length) {
+      const q = queries[next++];
+      try { elements.push(...((await overpass(q.query)).elements || [])); }
+      catch { failedGroups.add(q.group); }
+      onProgress(++done, queries.length);
+    }
+  }
+  await Promise.all([worker(), worker()]);
+  if (failedGroups.size === new Set(queries.map(q => q.group)).size) {
+    throw new Error("The OpenStreetMap place servers are busy or unreachable right now. Wait a minute and try again.");
+  }
+  return { elements, failedGroups };
+}
+
+async function driveTimes(origin, dests, onProgress) {
+  const out = new Array(dests.length).fill(null);
+  let originSnapM = null;
+  for (let i = 0; i < dests.length; i += OSRM_CHUNK) {
+    const chunk = dests.slice(i, i + OSRM_CHUNK);
+    const coords = [origin, ...chunk].map(p => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`).join(";");
+    let data = null;
+    for (let tries = 0; tries < 2 && !data; tries++) {
+      try {
+        data = await fetchJSON(`${OSRM}${coords}?sources=0&annotations=duration,distance`, {}, 45000);
+        if (data.code !== "Ok") throw new Error(data.message || data.code);
+      } catch (e) { data = null; await sleep(2000); }
+    }
+    if (data) {
+      originSnapM = data.sources && data.sources[0] ? data.sources[0].distance : originSnapM;
+      chunk.forEach((_, j) => {
+        const dur = data.durations[0][j + 1], dist = data.distances ? data.distances[0][j + 1] : null;
+        const snap = data.destinations[j + 1] ? data.destinations[j + 1].distance : null;
+        out[i + j] = dur == null ? null : { sec: dur, m: dist, snapM: snap };
+      });
+    }
+    onProgress(Math.min(i + OSRM_CHUNK, dests.length), dests.length);
+    await sleep(1100); // demo server fair use: 1 request per second
+  }
+  return { times: out, originSnapM };
+}
+
+// ---------- Geometry ----------
+function haversineKm(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const kmToMi = km => km * 0.621371;
+
+// ---------- Places ----------
+function isClosed(t) {
+  if (/\bclosed\b|\(former\)|\bformer\b/i.test(t.name || "")) return true;
+  if (t.disused === "yes" || t.abandoned === "yes" || t.opening_hours === "closed") return true;
+  return Object.keys(t).some(k => /^(disused|abandoned|was|demolished|razed):/.test(k));
+}
+function subtype(t) {
+  const v = t.craft || t.tourism || (t.leisure && t.leisure !== "park" ? t.leisure : null) || t.amenity || t.natural || t.shop || t.leisure || t.highway || t.landuse;
+  const m = { winter_sports: "ski area", nature_reserve: "nature preserve", arts_centre: "arts center", theatre: "theater",
+    ice_cream: "ice cream", golf_course: "golf course", slipway: "boat launch", beach_resort: "beach", supermarket: "grocery",
+    theme_park: "theme park", water_park: "water park", miniature_golf: "mini golf" };
+  return m[v] || (v || "").replace(/_/g, " ");
+}
+
+const radiusKm = (cat, cutoffMin) => Math.min(cutoffMin * KM_PER_MIN, cat.wide ? WIDE_MAX_KM : DENSE_MAX_KM);
+function bbox(origin, km) {
+  const dLat = km / 111.32, dLng = km / (111.32 * Math.cos(origin.lat * Math.PI / 180));
+  return [origin.lat - dLat, origin.lng - dLng, origin.lat + dLat, origin.lng + dLng].map(v => v.toFixed(5)).join(",");
+}
+// One small query per (group, radius) keeps each request fast enough for the public servers.
+function buildQueries(origin, cutoffMin, catIds) {
+  const buckets = new Map();
+  CATS.filter(c => catIds.includes(c.id)).forEach(c => {
+    const km = radiusKm(c, cutoffMin), key = `${c.group}|${km}`;
+    if (!buckets.has(key)) buckets.set(key, { group: c.group, km, sels: [] });
+    buckets.get(key).sels.push(...c.sel);
+  });
+  return [...buckets.values()].map(b => ({ group: b.group,
+    query: `[out:json][timeout:55][bbox:${bbox(origin, b.km)}];(${b.sels.map(s => s + ";").join("")});out center tags;` }));
+}
+
+function classify(elements, origin, catIds, cutoffMin) {
+  const active = CATS.filter(c => catIds.includes(c.id));
+  const byCat = Object.fromEntries(active.map(c => [c.id, []]));
+  let hiddenClosed = 0;
+  for (const e of elements) {
+    const t = e.tags || {};
+    const lat = e.lat ?? (e.center && e.center.lat), lng = e.lon ?? (e.center && e.center.lon);
+    if (lat == null || lng == null) continue;
+    const cat = active.find(c => c.match(t));
+    if (!cat) continue;
+    if (!t.name && !cat.allowUnnamed) continue;
+    if (isClosed(t)) { hiddenClosed++; continue; }
+    const p = { lat, lng };
+    const km = haversineKm(origin, p);
+    if (km > radiusKm(cat, cutoffMin)) continue;
+    byCat[cat.id].push({
+      id: `${e.type}/${e.id}`, cat: cat.id, name: t.name || "Boat launch (no name in OpenStreetMap)", unnamed: !t.name,
+      lat, lng, km, sub: subtype(t),
+      website: t.website || t["contact:website"] || t.url || "",
+      town: t["addr:city"] || "", phone: t.phone || t["contact:phone"] || "",
+      hours: t.opening_hours || "",
+    });
+  }
+  for (const id in byCat) {
+    const list = byCat[id].sort((a, b) => a.km - b.km);
+    const kept = [];
+    for (const p of list) {
+      const key = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const radius = p.unnamed ? 0.1 : 0.6;
+      if (kept.some(k => (k.unnamed === p.unnamed) && (p.unnamed || k.name.toLowerCase().replace(/[^a-z0-9]/g, "") === key) && haversineKm(k, p) < radius)) continue;
+      kept.push(p);
+    }
+    byCat[id] = { all: kept.length, list: kept.slice(0, PER_CAT), capped: kept.length > PER_CAT };
+  }
+  return { byCat, hiddenClosed };
+}
+
+// ---------- Map ----------
+let map = null, layer = null, originMarker = null, current = null;
+const markerById = new Map();
+function ensureMap() {
+  if (map || !window.L) return;
+  map = L.map("map", { scrollWheelZoom: false }).setView([43.6, -71.5], 8);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  layer = L.layerGroup().addTo(map);
+}
+function drawMap(origin, places) {
+  ensureMap();
+  if (!map) return;
+  layer.clearLayers(); markerById.clear();
+  if (originMarker) originMarker.remove();
+  originMarker = L.marker([origin.lat, origin.lng], { draggable: true, title: "Property" }).addTo(map)
+    .bindPopup("<strong>Property</strong><br>Drag this pin to correct the location.");
+  originMarker.on("dragend", () => {
+    const ll = originMarker.getLatLng();
+    $("maphint").innerHTML = `Pin moved. <button type="button" class="btn ghost" id="rerun">Search from the pin</button>`;
+    $("rerun").addEventListener("click", () => run({ lat: ll.lat, lng: ll.lng, label: `Map pin ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`, precision: { cls: "exact", text: "Placed by you on the map" }, town: current?.origin?.town || "" }));
+  });
+  const bounds = [[origin.lat, origin.lng]];
+  for (const p of places) {
+    const cat = CATS.find(c => c.id === p.cat);
+    const color = cssVar(GROUPS.find(g => g.id === cat.group).color);
+    const m = L.circleMarker([p.lat, p.lng], { radius: 6, color: "#ffffff", weight: 1.5, fillColor: color, fillOpacity: 0.95 })
+      .bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(cat.label)} · ${fmtMin(p.sec)} drive`);
+    m.addTo(layer); markerById.set(p.id, m); bounds.push([p.lat, p.lng]);
+  }
+  map.fitBounds(bounds, { padding: [24, 24], maxZoom: 13 });
+  $("maphint").textContent = "Colored dots are places within your cutoff. Drag the pin to correct the property location.";
+}
+function focusPlace(id) {
+  const m = markerById.get(id);
+  if (!m || !map) return;
+  map.setView(m.getLatLng(), Math.max(map.getZoom(), 12));
+  m.openPopup();
+  if (window.matchMedia("(max-width: 900px)").matches) $("map").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+// ---------- Formatting ----------
+const fmtMin = sec => sec == null ? "—" : `${Math.max(1, Math.round(sec / 60))} min`;
+const fmtMi = m => m == null ? "" : `${kmToMi(m / 1000).toFixed(1)} mi`;
+const gmapsDir = (o, p) => `https://www.google.com/maps/dir/?api=1&origin=${o.lat},${o.lng}&destination=${p.lat},${p.lng}`;
+const gmapsSearch = (p, town) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + (p.town || town ? ", " + (p.town || town) : ""))}`;
+const osmUrl = p => `https://www.openstreetmap.org/${p.id}`;
+const safeUrl = u => /^https?:\/\//i.test(u) ? u : (u ? "https://" + u.replace(/^\/+/, "") : "");
+
+// ---------- Rendering ----------
+function render(state) {
+  const { origin, cutoff, catIds, cats, hiddenClosed, originSnapM, failedRoutes, failedGroups } = state;
+  const failedCat = id => failedGroups && failedGroups.has(CATS.find(c => c.id === id).group);
+  const active = DISPLAY_ORDER.filter(id => catIds.includes(id));
+  const scored = active.filter(id => !failedCat(id));
+  const met = scored.filter(id => cats[id].within.length > 0);
+  const notes = [];
+  if (origin.precision.cls === "approx") notes.push(`<div class="notice warn">${esc(origin.precision.text)}. Drive times are measured from that point, so check the pin on the map and drag it onto the property if it's off.</div>`);
+  if (originSnapM != null && originSnapM > SNAP_WARN_M) notes.push(`<div class="notice warn">The nearest drivable road is ${fmtMi(originSnapM)} from the pin, so drive times start from that road.</div>`);
+  if (failedGroups && failedGroups.size) notes.push(`<div class="notice bad">The place search timed out for: ${[...failedGroups].map(g => esc(GROUPS.find(x => x.id === g).label)).join(", ")}. Those categories show as empty, but that doesn't mean nothing is there. Search again to retry.</div>`);
+  if (failedRoutes > 0) notes.push(`<div class="notice warn">${failedRoutes} place(s) couldn't get a drive time (no road route found, or the routing server didn't answer). They're left out.</div>`);
+
+  const alts = (state.alternatives || []).slice(1, 5);
+  const altHtml = alts.length ? `<div class="alts">Not the right place? ${alts.map((a, i) =>
+    `<button type="button" data-alt="${i + 1}">${esc(a.label.split(",").slice(0, 3).join(","))}</button>`).join("")}</div>` : "";
+
+  const tiles = GROUPS.map(g => {
+    const ids = active.filter(id => CATS.find(c => c.id === id).group === g.id);
+    if (!ids.length) return "";
+    if (failedGroups && failedGroups.has(g.id)) return `<div class="tile" style="--gc:var(${g.color})"><span class="t-name">${esc(g.label)}</span><span class="t-big">Not loaded</span><span class="t-near">Search timed out. Try again.</span></div>`;
+    const total = ids.reduce((s, id) => s + cats[id].within.length, 0);
+    const anyCapped = ids.some(id => cats[id].capped && cats[id].within.length === cats[id].list.length);
+    const nearest = ids.flatMap(id => cats[id].within).sort((a, b) => a.sec - b.sec)[0];
+    return `<div class="tile" style="--gc:var(${g.color})">
+      <span class="t-name">${esc(g.label)}</span>
+      <span class="t-big">${total}${anyCapped ? "+" : ""} place${total === 1 ? "" : "s"}</span>
+      <span class="t-near">${nearest ? `Nearest: ${esc(nearest.name)}, ${fmtMin(nearest.sec)}` : `None within ${cutoff} min`}</span>
+    </div>`;
+  }).join("");
+
+  const groupsHtml = GROUPS.map(g => {
+    const ids = active.filter(id => CATS.find(c => c.id === id).group === g.id);
+    if (!ids.length) return "";
+    if (failedGroups && failedGroups.has(g.id)) return `<section class="group"><h3><span class="swatch" style="background:var(${g.color})"></span>${esc(g.label)} <span class="gmeta">search timed out, not counted in the score</span></h3></section>`;
+    const gMet = ids.filter(id => cats[id].within.length).length;
+    return `<section class="group">
+      <h3><span class="swatch" style="background:var(${g.color})"></span>${esc(g.label)} <span class="gmeta">${gMet} of ${ids.length} categories within ${cutoff} min</span></h3>
+      ${ids.map(id => catHtml(id, cats[id], state)).join("")}
+    </section>`;
+  }).join("");
+
+  resultsEl.innerHTML = `
+    <div class="origin">
+      <div><span class="precision ${origin.precision.cls}">${esc(origin.precision.text)}</span></div>
+      <h2>${esc(origin.label)}</h2>
+      ${altHtml}
+      ${notes.join("")}
+    </div>
+    <div class="score">
+      <div class="score-head">
+        <div class="score-num">${met.length}<small>/${scored.length}</small></div>
+        <div class="score-label">categories have at least one place within a <strong>${cutoff}-minute drive</strong>. Think of it as a guest-demand report card: one box per category, and the score counts how many boxes are checked.</div>
+      </div>
+      <div class="tiles">${tiles}</div>
+      <div class="actions">
+        <button type="button" class="btn ghost" id="copySum">Copy summary</button>
+        <button type="button" class="btn ghost" id="dlCsv">Download CSV</button>
+        <span class="status" id="copyMsg" aria-live="polite"></span>
+      </div>
+      <details class="method"><summary>How this is calculated</summary>
+        <ul>
+          <li>Places come from OpenStreetMap tags (for example <code>landuse=winter_sports</code> for ski areas and <code>amenity=restaurant</code> for restaurants). Places that need a name are left out if OpenStreetMap doesn't have one.</li>
+          <li>For each category, the ${PER_CAT} closest places in a straight line get a drive time, and only those within ${cutoff} min are shown. A "+" means there are more than ${PER_CAT}, so the count is a minimum.</li>
+          <li>Drive times come from OSRM on the OpenStreetMap road network, with no traffic and no seasonal road closures. Large areas such as ski resorts are measured to their center, snapped to the nearest road.</li>
+          <li>${hiddenClosed} place(s) were hidden because OpenStreetMap marks them closed or disused.</li>
+          <li>The data has no ratings or reviews. Use the "Google" link on any place to check those.</li>
+        </ul>
+      </details>
+    </div>
+    ${groupsHtml}`;
+
+  resultsEl.querySelectorAll("[data-alt]").forEach(b => b.addEventListener("click", () => {
+    const a = state.alternatives[+b.dataset.alt];
+    run(a, state.alternatives);
+  }));
+  resultsEl.querySelectorAll("[data-focus]").forEach(b => b.addEventListener("click", () => focusPlace(b.dataset.focus)));
+  resultsEl.querySelectorAll("[data-more]").forEach(b => b.addEventListener("click", () => {
+    const ol = resultsEl.querySelector(`ol[data-cat="${b.dataset.more}"]`);
+    ol.querySelectorAll("li[hidden]").forEach(li => { li.hidden = false; });
+    b.remove();
+  }));
+  $("copySum").addEventListener("click", () => copySummary(state));
+  $("dlCsv").addEventListener("click", () => downloadCsv(state));
+}
+
+function catHtml(id, c, state) {
+  const def = CATS.find(x => x.id === id);
+  const n = c.within.length;
+  const plus = c.capped && n === c.list.length ? "+" : "";
+  const pill = n ? `<span class="pill has">${n}${plus} within ${state.cutoff} min · nearest ${fmtMin(c.within[0].sec)}</span>`
+                 : `<span class="pill none">None within ${state.cutoff} min</span>`;
+  if (!n) {
+    const beyond = c.list.filter(p => p.sec != null).sort((a, b) => a.sec - b.sec)[0];
+    return `<div class="cat"><div class="cat-head"><h4>${esc(def.label)}</h4>${pill}</div>
+      <div class="empty-cat">${beyond ? `Closest found: ${esc(beyond.name)}, ${fmtMin(beyond.sec)} away.` : "OpenStreetMap has none in the search area."}</div></div>`;
+  }
+  const SHOW = 5;
+  const items = c.within.map((p, i) => {
+    const flags = [];
+    if (p.snapM != null && p.snapM > SNAP_WARN_M) flags.push(`<span class="flag">measured to a road ${fmtMi(p.snapM)} away</span>`);
+    const web = p.website ? `<a href="${esc(safeUrl(p.website))}" target="_blank" rel="noopener">Website</a>` : "";
+    return `<li ${i >= SHOW ? "hidden" : ""}>
+      <div class="time">${fmtMin(p.sec)}<small>${fmtMi(p.m)}</small></div>
+      <div style="min-width:0">
+        <button type="button" class="pname" data-focus="${esc(p.id)}">${esc(p.name)}</button>
+        <div class="pmeta"><span>${esc(p.sub)}</span>
+          <a href="${esc(gmapsDir(state.origin, p))}" target="_blank" rel="noopener">Directions</a>
+          ${p.unnamed ? "" : `<a href="${esc(gmapsSearch(p, state.origin.town))}" target="_blank" rel="noopener">Google</a>`}
+          ${web}
+          <a href="${esc(osmUrl(p))}" target="_blank" rel="noopener">OSM</a>
+          ${flags.join("")}
+        </div>
+      </div></li>`;
+  }).join("");
+  const more = n > SHOW ? `<button type="button" class="more" data-more="${id}">Show all ${n}</button>` : "";
+  return `<div class="cat"><div class="cat-head"><h4>${esc(def.label)}</h4>${pill}</div>
+    <ol class="places" data-cat="${id}">${items}</ol>${more}</div>`;
+}
+
+function summaryText(state) {
+  const { origin, cutoff, catIds, cats } = state;
+  const active = DISPLAY_ORDER.filter(id => catIds.includes(id));
+  const met = active.filter(id => cats[id].within.length);
+  const lines = [`${origin.label}`, `Within a ${cutoff}-minute drive: ${met.length} of ${active.length} categories present (OpenStreetMap data, drive times without traffic).`, ""];
+  for (const id of active) {
+    const c = cats[id], def = CATS.find(x => x.id === id);
+    if (!c.within.length) { lines.push(`${def.label}: none within ${cutoff} min`); continue; }
+    const top = c.within.slice(0, 3).map(p => `${p.name} (${fmtMin(p.sec)})`).join(", ");
+    lines.push(`${def.label}: ${c.within.length}${c.capped && c.within.length === c.list.length ? "+" : ""}, e.g. ${top}`);
+  }
+  return lines.join("\n");
+}
+async function copySummary(state) {
+  const text = summaryText(state);
+  const msg = $("copyMsg");
+  try { await navigator.clipboard.writeText(text); msg.textContent = "Summary copied."; }
+  catch {
+    const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); msg.textContent = "Summary copied."; } catch { msg.textContent = "Copy failed. Select the text and copy it yourself."; }
+    ta.remove();
+  }
+}
+function downloadCsv(state) {
+  const rows = [["group", "category", "name", "type", "drive_min", "drive_miles", "straight_line_miles", "lat", "lng", "website", "openstreetmap_url"]];
+  for (const id of DISPLAY_ORDER.filter(x => state.catIds.includes(x))) {
+    const def = CATS.find(x => x.id === id), g = GROUPS.find(x => x.id === def.group);
+    for (const p of state.cats[id].within) rows.push([g.label, def.label, p.name, p.sub, Math.round(p.sec / 60),
+      p.m == null ? "" : kmToMi(p.m / 1000).toFixed(1), kmToMi(p.km).toFixed(1), p.lat.toFixed(6), p.lng.toFixed(6), p.website, osmUrl(p)]);
+  }
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `nearby-${state.cutoff}min-${state.origin.label.split(",")[0].replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+// ---------- Main flow ----------
+function selectedCatIds() {
+  const groups = UI_GROUPS.filter(g => $(`grp-${g.id}`).checked).flatMap(g => g.groups);
+  return CATS.filter(c => groups.includes(c.group)).map(c => c.id);
+}
+
+let busy = false;
+async function run(origin, alternatives) {
+  if (busy) return;
+  const catIds = selectedCatIds();
+  if (!catIds.length) { showMsg("Pick at least one category group."); return; }
+  const cutoff = +cutoffEl.value;
+  busy = true; goBtn.disabled = true; clearMsg();
+  try {
+    setStatus("Searching OpenStreetMap for places… (usually 10–60 seconds)");
+    const queries = buildQueries(origin, cutoff, catIds);
+    const { elements, failedGroups } = await overpassAll(queries, (d, t) => setStatus(`Searching OpenStreetMap for places… ${d} of ${t} searches done`));
+    const { byCat, hiddenClosed } = classify(elements, origin, catIds, cutoff);
+    const flat = catIds.flatMap(id => byCat[id].list);
+    setStatus(`Found ${flat.length} candidate places. Calculating drive times…`);
+    const { times, originSnapM } = await driveTimes(origin, flat, (d, t) => setStatus(`Calculating drive times… ${d} of ${t}`));
+    let failedRoutes = 0;
+    flat.forEach((p, i) => { const r = times[i]; if (r) { p.sec = r.sec; p.m = r.m; p.snapM = r.snapM; } else { p.sec = null; failedRoutes++; } });
+    const cats = {};
+    for (const id of catIds) {
+      const c = byCat[id];
+      const within = c.list.filter(p => p.sec != null && p.sec <= cutoff * 60).sort((a, b) => a.sec - b.sec);
+      cats[id] = { ...c, within };
+    }
+    current = { origin, cutoff, catIds, cats, hiddenClosed, originSnapM, failedRoutes, failedGroups, alternatives: alternatives || [origin] };
+    render(current);
+    drawMap(origin, catIds.flatMap(id => cats[id].within));
+    setStatus(`Done. Checked ${flat.length} places, and ${catIds.reduce((s, id) => s + cats[id].within.length, 0)} are within ${cutoff} min.`);
+  } catch (e) {
+    setStatus("");
+    showMsg(esc(e.message || String(e)), "bad");
+  } finally { busy = false; goBtn.disabled = false; }
+}
+
+form.addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (busy) return;
+  clearMsg();
+  store.set("ndf.cutoff", cutoffEl.value);
+  store.set("ndf.groups", UI_GROUPS.filter(g => $(`grp-${g.id}`).checked).map(g => g.id).join(","));
+  const parsed = parseInput(qEl.value);
+  if (parsed.error) { showMsg(esc(parsed.error)); return; }
+  let listingLabel = "";
+  if (parsed.listing) {
+    const areaRow = $("areaRow"), area = $("area").value.trim();
+    areaRow.hidden = false;
+    if (!area) {
+      showMsg(`${parsed.listing.site} doesn't put the address in its links, and it blocks other sites from reading its pages. Type the town shown on the listing (right under the photos, e.g. “Entire home in <strong>Madison, New Hampshire</strong>”) in the new box, then press Find nearby. If you have the exact address, use that for exact drive times.`);
+      $("area").focus();
+      return;
+    }
+    parsed.query = area; parsed.source = "text";
+    listingLabel = `${parsed.listing.site} listing${parsed.listing.id ? " " + parsed.listing.id : ""}`;
+  } else { $("areaRow").hidden = true; }
+  if (parsed.lat != null) {
+    run({ lat: parsed.lat, lng: parsed.lng, label: parsed.label, town: "", precision: { cls: "exact", text: `Exact point from ${parsed.source}` } });
+    return;
+  }
+  goBtn.disabled = true;
+  try {
+    if (parsed.source !== "text") setStatus(`Read address from ${parsed.source}: ${parsed.query}`);
+    const results = await geocode(parsed.query);
+    if (!results.length) {
+      setStatus("");
+      showMsg(`OpenStreetMap couldn't find “${esc(parsed.query)}”. Try adding the town and state, or just search the town and drag the pin onto the property.`);
+      return;
+    }
+    goBtn.disabled = false;
+    if (listingLabel) results.forEach(r => {
+      r.label = `${listingLabel}: ${r.label}`;
+      if (r.precision.cls !== "exact") r.precision = { cls: "approx", text: "Town-level match (the listing hides its exact address)" };
+    });
+    run(results[0], results);
+  } catch (e) {
+    setStatus("");
+    showMsg("The address search service didn't respond (" + esc(e.message) + "). Wait a moment and try again.", "bad");
+  } finally { if (!busy) goBtn.disabled = false; }
+});
+
+// expose for testing
+window.__ndf = { parseInput, classify, buildQueries };
+ensureMap();
+})();
+</script>
+</body>
+</html>
