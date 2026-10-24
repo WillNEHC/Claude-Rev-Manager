@@ -153,12 +153,12 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); border-top: 1px
 <div class="wrap">
   <header class="top">
     <h1 class="brand">Nearby Demand Finder</h1>
-    <p class="sub">Paste an Airbnb, VRBO, Zillow or Realtor.com link, or type an address or town. You'll see the ski areas, lakes, restaurants and things to do within a real drive time of the property.</p>
+    <p class="sub">Paste an Airbnb, VRBO, Vacasa, Zillow or Realtor.com link, or type an address or town. You'll see the ski areas, lakes, restaurants and things to do within a real drive time of the property.</p>
   </header>
 
   <form class="search" id="form" autocomplete="off">
     <div class="row">
-      <input id="q" type="text" placeholder="Paste an Airbnb, VRBO, Zillow or Realtor.com link, or type an address" aria-label="Address or link">
+      <input id="q" type="text" placeholder="Paste an Airbnb, VRBO, Vacasa, Zillow or Realtor.com link, or type an address" aria-label="Address or link">
       <label for="cutoff" class="sr">
         <select id="cutoff" aria-label="Drive time cutoff">
           <option value="10">10 min drive</option>
@@ -176,6 +176,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); border-top: 1px
     <div class="groups" id="groupToggles"></div>
     <div class="examples">Try:
       <button type="button" data-ex="https://www.airbnb.com/rooms/51867236" data-area="Madison, NH">Alpine Retreat (Airbnb, Madison NH)</button>
+      <button type="button" data-ex="https://www.vacasa.com/unit/75247" data-area="Jackson, NH">The Ski Haus (Vacasa, Jackson NH)</button>
       <button type="button" data-ex="Gilford, NH">Gilford, NH</button>
       <button type="button" data-ex="Holderness, NH 03245">Holderness, NH</button>
       <button type="button" data-ex="Lincoln, NH 03251">Lincoln, NH</button>
@@ -194,7 +195,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); border-top: 1px
           <li><strong>Measures actual driving time</strong> on the road network, not a straight-line circle. A lake between you and a ski hill counts. Times are estimates without traffic.</li>
           <li><strong>Scores the location</strong> by how many of the categories have at least one place within your drive-time cutoff. It's like a report card with one box per category: the score is how many boxes are checked. Nothing in it is guessed.</li>
         </ul>
-        <p class="sub">If you paste an Airbnb or VRBO link, a second box appears. Type the town shown on the listing there, because those sites hide the exact address.</p>
+        <p class="sub">If you paste a rental listing link (Airbnb, VRBO, Vacasa), a second box appears. Type the town shown on the listing there, because those sites hide the exact address.</p>
       </div>
     </div>
     <div class="mapcol">
@@ -343,9 +344,11 @@ function parseInput(raw) {
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
   const segs = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
 
-  if (/(^|\.)airbnb\.|(^|\.)vrbo\.|(^|\.)homeaway\./.test(host)) {
-    const site = /airbnb/.test(host) ? "Airbnb" : "VRBO";
-    const idm = url.pathname.match(/\/(?:rooms|h)\/(?:plus\/)?(\d+)/) || url.pathname.match(/\/(\d{4,})(?:[a-z]+)?$/i);
+  const STR_SITES = { airbnb: "Airbnb", vrbo: "VRBO", homeaway: "VRBO", vacasa: "Vacasa", evolve: "Evolve", "booking.com": "Booking.com" };
+  const strKey = Object.keys(STR_SITES).find(k => host.includes(k));
+  if (strKey) {
+    const site = STR_SITES[strKey];
+    const idm = url.pathname.match(/\/(?:rooms|h|unit)\/(?:plus\/)?(\d+)/) || url.pathname.match(/\/(\d{4,})(?:[a-z]+)?$/i);
     return { listing: { site, id: idm ? idm[1] : "" }, source: `${site} link` };
   }
   if (host.endsWith("zillow.com")) {
