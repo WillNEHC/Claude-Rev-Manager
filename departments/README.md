@@ -1,36 +1,20 @@
-# New England Host Co — AI Departments
+# New England Host Co — Revenue Management
 
-How NEHC runs as a team of AI "departments" with humans approving the decisions.
+This repository is NEHC's **revenue management** desk: pricing, occupancy, pace,
+and market intelligence for the homes NEHC runs. Other functions (guest
+experience, brand, operations) are out of scope here.
 
-**Rule #1: advise, never act alone.** Every department researches and recommends.
-Will (or Kyle) approves before any price, listing, message or spend changes.
+**Rule #1: advise, never act alone.** The desk researches and recommends.
+Will approves before any price, min stay, discount or override changes in PriceLabs.
 Every recommendation must cite the data it came from. No data = no recommendation.
 
-## The team
-
-| Dept | Status | Owner (AI) | Human approver | Reports to |
-| --- | --- | --- | --- | --- |
-| Revenue & Pricing | **Live** (since 2026-11-08) — weekly, Mondays | Claude | Will | Will's Slack DM |
-| Guest Experience & Reviews | **Live** (since 2026-11-08) — weekly with revenue; review data waits on Hospitable↔Zapier sign-in | Claude | Will | Will's Slack DM |
-| Brand & Social | Planned | Muse (Meta) — Facebook/Instagram/Meta ads | Will | Slack + Notion |
-| Operations (turnovers, maintenance, VA + cleaners) | Planned | Claude | Will / VA | Slack |
-| Owner Relations & Growth | Planned | Claude | Kyle / Will | Slack |
-
-## How Claude and Muse share work
-
-Muse (Meta's agent) and Claude cannot call each other directly. Both connect to
-**Slack** and **Notion**, so those are the shared office. Claude posts
-"handoffs" (e.g. "3 post ideas for this week, with the data behind them") and
-Will forwards or asks Muse to pick them up and build/schedule posts in the
-Meta apps. Muse covers what only Meta can: Facebook, Instagram, Meta ads, WhatsApp.
-
-## Folder layout
-
-```
-departments/
-  README.md                 ← this file
-  revenue/
-    README.md               ← charter, weekly routine, approval rules
-    reports/YYYY-MM-DD.md   ← each weekly report (the approval list)
-    learnings.md            ← what each run taught us; feeds the next tool upgrade
-```
+| What | Detail |
+| --- | --- |
+| Owner (AI) | Claude |
+| Approver | Will |
+| Cadence | Weekly, Mondays 7:17am ET (scheduled) |
+| Reports to | Will's Slack DM only |
+| Playbook | [`revenue/README.md`](revenue/README.md) |
+| Reports | [`revenue/reports/`](revenue/reports/) |
+| Lessons → tool upgrades | [`revenue/learnings.md`](revenue/learnings.md) |
+| Tool | `src/revenue/calendar-scan.ts` (`npx tsx src/jobs/revenue-scan.ts …`) |
