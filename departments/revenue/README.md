@@ -15,7 +15,11 @@ the instruments every week, and asks the captain (Will) before touching the cont
 | Strolling Woods (Webster Lake estate) | Franklin, NH | 8 | 242377c7-… |
 | Modern 3BR/2BA — 3 min to Okemo | Ludlow, VT | 3 | 8e787b69-… |
 | 3BR/2BA Near Okemo — Mountain Getaway | Ludlow, VT | 3 | 82016dab-… |
-| Cozy 6BR/4BA Near Okemo (likely the two 3BRs combined — to confirm) | Ludlow, VT | 6 | 5cf03c9c-… |
+| Cozy 6BR/4BA Near Okemo (= both 3BR units rented together; confirmed by Will 2026-11-08) | Ludlow, VT | 6 | 5cf03c9c-… |
+
+**Okemo rule:** the Modern 3BR, the Getaway 3BR and the 6BR are one building
+sold three ways. A booking on either 3BR blocks the 6BR, and the reverse. Always
+review the three together: compare the 6BR price with the two halves combined.
 | 44 Maywood | Worcester, MA | 3 | ba59e74c-… |
 
 12 other PriceLabs listings have sync OFF and are out of scope until Will
@@ -35,7 +39,8 @@ confirms which are active vs. old.
    can contradict its market data (see `learnings.md`); comps win.
 4. **Write** `reports/YYYY-MM-DD.md`: numbered recommendations, each with
    current value → proposed value, the evidence, and the risk.
-5. **Post** the summary to Slack and wait for approval. Will replies with the
+5. **Post** the summary to Will's Slack DM (only Will for now; no channels, no
+   Kyle until Will says so) and wait for approval. Will replies with the
    numbers he approves (e.g. "approve R1, R3"). Nothing changes until then.
 6. **Apply** approved changes in PriceLabs, then **log** them in the report.
 7. **Learn:** add anything the run taught us to `learnings.md`, and upgrade the
