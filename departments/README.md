@@ -11,7 +11,7 @@ Every recommendation must cite the data it came from. No data = no recommendatio
 | Dept | Status | Owner (AI) | Human approver | Reports to |
 | --- | --- | --- | --- | --- |
 | Revenue & Pricing | **Live** (since 2026-11-08) — weekly, Mondays | Claude | Will | Will's Slack DM |
-| Guest Experience & Reviews | Planned (next) | Claude | Will | Slack |
+| Guest Experience & Reviews | **Live** (since 2026-11-08) — weekly with revenue; review data waits on Hospitable↔Zapier sign-in | Claude | Will | Will's Slack DM |
 | Brand & Social | Planned | Muse (Meta) — Facebook/Instagram/Meta ads | Will | Slack + Notion |
 | Operations (turnovers, maintenance, VA + cleaners) | Planned | Claude | Will / VA | Slack |
 | Owner Relations & Growth | Planned | Claude | Kyle / Will | Slack |
